@@ -2,69 +2,59 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Login - Pastelería</title>
+<title>Login | Pastelería</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-body { margin:0; font-family:Arial,sans-serif; background:linear-gradient(135deg,#ff9eb5,#ffc1d6); display:flex; justify-content:center; align-items:center; height:100vh; }
-.container { background:white; padding:40px; border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,0.2); width:350px; }
-h2 { text-align:center; margin-bottom:25px; color:#ff4d88; }
+body { margin:0;font-family:Arial,sans-serif; background:linear-gradient(135deg,#ff9eb5,#ffc1d6); display:flex; justify-content:center; align-items:center; height:100vh; }
+.container { background:white;padding:40px;border-radius:12px;box-shadow:0 8px 20px rgba(0,0,0,0.2); width:350px; }
+h2 { text-align:center;margin-bottom:25px;color:#ff4d88; }
 .input-group { margin-bottom:15px; }
-input { width:100%; padding:10px; border-radius:6px; border:1px solid #ccc; outline:none; }
+input { width:100%;padding:10px;border-radius:6px;border:1px solid #ccc; outline:none; }
 input:focus { border-color:#ff4d88; }
-.btn { width:100%; padding:10px; background:#ff4d88; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer; margin-top:10px; }
+.btn { width:100%;padding:10px;background:#ff4d88;color:white;border:none;border-radius:6px;font-weight:bold;cursor:pointer; margin-top:10px; }
 .btn:hover { opacity:0.9; }
-.login-link { text-align:center; margin-top:15px; }
+.login-link { text-align:center;margin-top:15px; }
 .login-link a { color:#ff4d88; text-decoration:none; font-weight:bold; }
-.error { color:red; font-size:14px; margin-top:5px; text-align:center; }
-.success { color:green; font-size:14px; margin-top:5px; text-align:center; }
+.error { color:red;font-size:14px;margin-top:5px;text-align:center; }
+.success { color:green;font-size:14px;margin-top:5px;text-align:center; }
 </style>
 </head>
 <body>
 
 <div class="container">
 <h2>Iniciar Sesión</h2>
-<div class="input-group">
-<input type="email" id="correo" placeholder="Correo" required>
-</div>
-<div class="input-group">
-<input type="password" id="password" placeholder="Contraseña" required>
-</div>
+<div class="input-group"><input type="email" id="correo" placeholder="Correo" required></div>
+<div class="input-group"><input type="password" id="password" placeholder="Contraseña" required></div>
 <button class="btn" onclick="login()">Entrar</button>
-<div class="login-link">
-¿No tienes cuenta? <a href="register.html">Regístrate</a>
-</div>
+<div class="login-link">¿No tienes cuenta? <a href="register.html">Regístrate</a></div>
 <div id="mensaje"></div>
 </div>
 
 <script>
+// Redirige si ya hay usuario guardado
+const usuarioGuardado = JSON.parse(localStorage.getItem("usuario"));
+if(usuarioGuardado){ window.location.href=(usuarioGuardado.role==="admin")?"admin.html":"index.html"; }
+
 async function login(){
-    const correo = document.getElementById("correo").value.trim();
-    const password = document.getElementById("password").value;
-    const mensajeDiv = document.getElementById("mensaje");
+    const correo=document.getElementById("correo").value.trim();
+    const password=document.getElementById("password").value;
+    const mensajeDiv=document.getElementById("mensaje");
     mensajeDiv.textContent=""; mensajeDiv.className="";
 
     try{
-        const res = await fetch("/api/login", {
+        const res=await fetch("/api/login",{
             method:"POST",
-            headers:{"Content-Type":"application/json"},
-            body:JSON.stringify({ correo, password })
+            headers:{ "Content-Type":"application/json" },
+            body: JSON.stringify({ correo,password })
         });
-        const data = await res.json();
-        if(!res.ok){
-            mensajeDiv.textContent=data.mensaje || "Error al iniciar sesión ❌";
-            mensajeDiv.className="error";
-            return;
-        }
+        const data=await res.json();
+        if(!res.ok){ mensajeDiv.textContent=data.mensaje||"Error al iniciar sesión ❌"; mensajeDiv.className="error"; return; }
+
         localStorage.setItem("usuario", JSON.stringify(data.usuario));
-        mensajeDiv.textContent="Login exitoso ✅ Redirigiendo...";
-        mensajeDiv.className="success";
-        setTimeout(()=>{
-            if(data.usuario.role==="admin"){ window.location.href="admin.html"; }
-            else{ window.location.href="index.html"; }
-        },1000);
-    } catch(err){
-        mensajeDiv.textContent="Error de conexión con el servidor ❌";
-        mensajeDiv.className="error";
+        mensajeDiv.textContent="Login exitoso ✅ Redirigiendo..."; mensajeDiv.className="success";
+        setTimeout(()=>{ window.location.href=(data.usuario.role==="admin")?"admin.html":"index.html"; },1000);
+    }catch(err){
+        mensajeDiv.textContent="Error de conexión con el servidor ❌"; mensajeDiv.className="error";
     }
 }
 </script>
