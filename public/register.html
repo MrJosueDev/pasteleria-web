@@ -72,49 +72,51 @@ input:focus { border-color: #ff4d88; }
 
 <script>
 document.getElementById("registerForm").addEventListener("submit", async function(e) {
-e.preventDefault();
+    e.preventDefault();
 
-const nombre = document.getElementById("nombre").value.trim();
-const correo = document.getElementById("correo").value.trim();
-const password = document.getElementById("password").value;
-const confirmPassword = document.getElementById("confirmPassword").value;
-const mensajeDiv = document.getElementById("mensaje");
+    const nombre = document.getElementById("nombre").value.trim();
+    const correo = document.getElementById("correo").value.trim();
+    const password = document.getElementById("password").value;
+    const confirmPassword = document.getElementById("confirmPassword").value;
+    const mensajeDiv = document.getElementById("mensaje");
 
-mensajeDiv.textContent = "";
-mensajeDiv.className = "";
+    mensajeDiv.textContent = "";
+    mensajeDiv.className = "";
 
-if (password !== confirmPassword) {
-    mensajeDiv.textContent = "Las contraseñas no coinciden ❌";
-    mensajeDiv.className = "error";
-    return;
-}
-
-try {
-    const res = await fetch("/api/usuarios", {  // 🔥 CAMBIO A /api/usuarios
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nombre, correo, password })
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-        mensajeDiv.textContent = data.mensaje || "Error en el registro ❌";
+    if (password !== confirmPassword) {
+        mensajeDiv.textContent = "Las contraseñas no coinciden ❌";
         mensajeDiv.className = "error";
         return;
     }
 
-    mensajeDiv.textContent = "Registro exitoso ✅ Ahora puedes iniciar sesión";
-    mensajeDiv.className = "success";
+    try {
+        // ✅ URL dinámica para local y Render
+        const API_URL = window.location.origin + "/api/usuarios";
+        const res = await fetch(API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ nombre, correo, password })
+        });
 
-    setTimeout(() => {
-        window.location.href = "login.html";
-    }, 1500);
+        const data = await res.json();
 
-} catch (err) {
-    mensajeDiv.textContent = "Error de conexión con el servidor ❌";
-    mensajeDiv.className = "error";
-}
+        if (!res.ok) {
+            mensajeDiv.textContent = data.mensaje || "Error en el registro ❌";
+            mensajeDiv.className = "error";
+            return;
+        }
+
+        mensajeDiv.textContent = "Registro exitoso ✅ Ahora puedes iniciar sesión";
+        mensajeDiv.className = "success";
+
+        setTimeout(() => {
+            window.location.href = "login.html";
+        }, 1500);
+
+    } catch (err) {
+        mensajeDiv.textContent = "Error de conexión con el servidor ❌";
+        mensajeDiv.className = "error";
+    }
 });
 </script>
 
