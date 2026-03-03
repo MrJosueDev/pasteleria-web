@@ -1,4 +1,4 @@
-// server.js - Versión final para Render
+// server.js - Versión final para Render con frontend en public/
 require('dotenv').config();
 const express = require("express");
 const mongoose = require("mongoose");
@@ -18,8 +18,8 @@ app.use(express.json());
 /* ========================
    📂 CONFIGURAR FRONTEND
 ======================== */
-// Ajusta la carpeta si tu frontend no está en 'public'
-const FRONTEND_PATH = path.join(__dirname, "public");
+// Como server.js está en backend/, subimos un nivel y apuntamos a public/
+const FRONTEND_PATH = path.join(__dirname, "..", "public");
 app.use(express.static(FRONTEND_PATH));
 
 app.get("/", (req, res) => {
@@ -60,18 +60,14 @@ const Pedido = mongoose.model("Pedido", pedidoSchema);
 /* ========================
    👤 RUTAS USUARIOS
 ======================== */
-
-// Registro
 app.post("/api/usuarios", async (req, res) => {
   try {
     const { nombre, correo, password } = req.body;
     const existe = await Usuario.findOne({ correo });
     if (existe) return res.status(400).json({ mensaje: "Correo ya registrado" });
-
     const hash = await bcrypt.hash(password, 10);
     const nuevoUsuario = new Usuario({ nombre, correo, password: hash });
     await nuevoUsuario.save();
-
     res.status(201).json({ mensaje: "Usuario creado", usuario: { nombre, correo, role: nuevoUsuario.role } });
   } catch (err) {
     console.error(err);
@@ -79,16 +75,13 @@ app.post("/api/usuarios", async (req, res) => {
   }
 });
 
-// Login
 app.post("/api/login", async (req, res) => {
   try {
     const { correo, password } = req.body;
     const usuario = await Usuario.findOne({ correo });
     if (!usuario) return res.status(400).json({ mensaje: "Correo no encontrado" });
-
     const valido = await bcrypt.compare(password, usuario.password);
     if (!valido) return res.status(400).json({ mensaje: "Contraseña incorrecta" });
-
     res.json({ mensaje: "Login exitoso", usuario: { nombre: usuario.nombre, correo: usuario.correo, role: usuario.role } });
   } catch (err) {
     console.error(err);
@@ -99,8 +92,6 @@ app.post("/api/login", async (req, res) => {
 /* ========================
    🛒 RUTAS PEDIDOS
 ======================== */
-
-// Crear pedido
 app.post("/api/pedidos", async (req, res) => {
   try {
     const { usuario, nombreCliente, direccion, productos, total } = req.body;
@@ -113,7 +104,6 @@ app.post("/api/pedidos", async (req, res) => {
   }
 });
 
-// Obtener pedidos de un usuario
 app.get("/api/pedidos/:correo", async (req, res) => {
   try {
     const pedidos = await Pedido.find({ usuario: req.params.correo }).sort({ createdAt: -1 });
@@ -124,7 +114,6 @@ app.get("/api/pedidos/:correo", async (req, res) => {
   }
 });
 
-// Obtener todos los pedidos (solo admin)
 app.get("/api/pedidos", async (req, res) => {
   try {
     const pedidos = await Pedido.find().sort({ createdAt: -1 });
@@ -135,7 +124,6 @@ app.get("/api/pedidos", async (req, res) => {
   }
 });
 
-// Actualizar estado de pedido
 app.put("/api/pedidos/:id", async (req, res) => {
   try {
     const { estado } = req.body;
@@ -148,7 +136,6 @@ app.put("/api/pedidos/:id", async (req, res) => {
   }
 });
 
-// Eliminar pedido
 app.delete("/api/pedidos/:id", async (req, res) => {
   try {
     const pedido = await Pedido.findByIdAndDelete(req.params.id);
