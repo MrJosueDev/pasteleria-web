@@ -1,4 +1,4 @@
-// server.js - Render listo con frontend en public
+// server.js - Versión final para Render con frontend en public
 require('dotenv').config();
 const express = require("express");
 const mongoose = require("mongoose");
@@ -16,17 +16,19 @@ app.use(cors());
 app.use(express.json());
 
 /* ========================
-   📂 RUTAS ESTÁTICAS FRONTEND
+   📂 CONFIGURAR FRONTEND
 ======================== */
-const FRONTEND_PATH = path.join(__dirname, "public"); // <-- ajuste importante
+// Ajuste para Render: public está en la raíz del proyecto
+const FRONTEND_PATH = path.resolve("public");
 app.use(express.static(FRONTEND_PATH));
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(FRONTEND_PATH, "index.html"));
 });
 
-// Rutas explícitas para HTML
-["login", "register", "admin", "carrito", "mis-pedidos", "pagos", "perfil"].forEach(page => {
+// Rutas explícitas para cada HTML
+const htmlPages = ["login", "register", "admin", "carrito", "mis-pedidos", "pagos", "perfil"];
+htmlPages.forEach(page => {
   app.get(`/${page}.html`, (req, res) => {
     res.sendFile(path.join(FRONTEND_PATH, `${page}.html`));
   });
@@ -70,11 +72,9 @@ app.post("/api/usuarios", async (req, res) => {
     const { nombre, correo, password } = req.body;
     const existe = await Usuario.findOne({ correo });
     if (existe) return res.status(400).json({ mensaje: "Correo ya registrado" });
-
     const hash = await bcrypt.hash(password, 10);
     const nuevoUsuario = new Usuario({ nombre, correo, password: hash });
     await nuevoUsuario.save();
-
     res.status(201).json({ mensaje: "Usuario creado", usuario: { nombre, correo, role: nuevoUsuario.role } });
   } catch (err) {
     console.error(err);
@@ -87,10 +87,8 @@ app.post("/api/login", async (req, res) => {
     const { correo, password } = req.body;
     const usuario = await Usuario.findOne({ correo });
     if (!usuario) return res.status(400).json({ mensaje: "Correo no encontrado" });
-
     const valido = await bcrypt.compare(password, usuario.password);
     if (!valido) return res.status(400).json({ mensaje: "Contraseña incorrecta" });
-
     res.json({ mensaje: "Login exitoso", usuario: { nombre: usuario.nombre, correo: usuario.correo, role: usuario.role } });
   } catch (err) {
     console.error(err);
@@ -120,6 +118,39 @@ app.get("/api/pedidos/:correo", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ mensaje: "Error al obtener pedidos" });
+  }
+});
+
+app.get("/api/pedidos", async (req, res) => {
+  try {
+    const pedidos = await Pedido.find().sort({ createdAt: -1 });
+    res.json(pedidos);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ mensaje: "Error al obtener pedidos" });
+  }
+});
+
+app.put("/api/pedidos/:id", async (req, res) => {
+  try {
+    const { estado } = req.body;
+    const pedido = await Pedido.findByIdAndUpdate(req.params.id, { estado }, { new: true });
+    if (!pedido) return res.status(404).json({ mensaje: "Pedido no encontrado" });
+    res.json({ mensaje: "Estado actualizado", pedido });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ mensaje: "Error al actualizar estado" });
+  }
+});
+
+app.delete("/api/pedidos/:id", async (req, res) => {
+  try {
+    const pedido = await Pedido.findByIdAndDelete(req.params.id);
+    if (!pedido) return res.status(404).json({ mensaje: "Pedido no encontrado" });
+    res.json({ mensaje: "Pedido eliminado correctamente" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ mensaje: "Error al eliminar pedido" });
   }
 });
 
