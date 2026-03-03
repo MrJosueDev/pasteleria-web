@@ -53,9 +53,10 @@ input:focus { border-color: #ff4d88; }
 </div>
 
 <script>
-const API = "http://localhost:5000";
+// 🔥 Cambiar API a la URL de tu backend en Render
+const API = "https://pasteleria-web-9awq.onrender.com";
 
-// 🔥 SI YA ESTÁ LOGUEADO, REDIRIGE AUTOMÁTICAMENTE
+// Si ya está logueado, redirige automáticamente
 const usuarioGuardado = JSON.parse(localStorage.getItem("usuario"));
 if(usuarioGuardado){
     if(usuarioGuardado.role === "admin"){
@@ -87,7 +88,7 @@ async function login(){
             return;
         }
 
-        // 🔥 GUARDAR USUARIO
+        // Guardar usuario
         localStorage.setItem("usuario", JSON.stringify(data.usuario));
 
         mensajeDiv.textContent = "Login exitoso ✅ Redirigiendo...";
@@ -102,6 +103,7 @@ async function login(){
         }, 1000);
 
     } catch(error){
+        console.error(error);
         mensajeDiv.textContent = "Error de conexión con el servidor ❌";
         mensajeDiv.className = "error";
     }
