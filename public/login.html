@@ -41,34 +41,30 @@ async function login(){
     const correo = document.getElementById("correo").value.trim();
     const password = document.getElementById("password").value;
     const mensajeDiv = document.getElementById("mensaje");
-    mensajeDiv.textContent = "";
-    mensajeDiv.className = "";
+    mensajeDiv.textContent=""; mensajeDiv.className="";
 
-    try {
-        const res = await fetch("/api/login",{ // relativo a Render
+    try{
+        const res = await fetch("/api/login", {
             method:"POST",
             headers:{"Content-Type":"application/json"},
-            body: JSON.stringify({correo, password})
+            body:JSON.stringify({ correo, password })
         });
         const data = await res.json();
         if(!res.ok){
-            mensajeDiv.textContent = data.mensaje || "Error al iniciar sesión ❌";
-            mensajeDiv.className = "error";
+            mensajeDiv.textContent=data.mensaje || "Error al iniciar sesión ❌";
+            mensajeDiv.className="error";
             return;
         }
         localStorage.setItem("usuario", JSON.stringify(data.usuario));
-        mensajeDiv.textContent = "Login exitoso ✅ Redirigiendo...";
-        mensajeDiv.className = "success";
+        mensajeDiv.textContent="Login exitoso ✅ Redirigiendo...";
+        mensajeDiv.className="success";
         setTimeout(()=>{
-            if(data.usuario.role==="admin"){
-                window.location.href="admin.html";
-            }else{
-                window.location.href="index.html";
-            }
+            if(data.usuario.role==="admin"){ window.location.href="admin.html"; }
+            else{ window.location.href="index.html"; }
         },1000);
     } catch(err){
-        mensajeDiv.textContent = "Error de conexión con el servidor ❌";
-        mensajeDiv.className = "error";
+        mensajeDiv.textContent="Error de conexión con el servidor ❌";
+        mensajeDiv.className="error";
     }
 }
 </script>

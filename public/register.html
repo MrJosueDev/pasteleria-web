@@ -57,8 +57,8 @@ document.getElementById("registerForm").addEventListener("submit", async functio
     const password = document.getElementById("password").value;
     const confirmPassword = document.getElementById("confirmPassword").value;
     const mensajeDiv = document.getElementById("mensaje");
-    mensajeDiv.textContent = "";
-    mensajeDiv.className = "";
+
+    mensajeDiv.textContent = ""; mensajeDiv.className = "";
 
     if(password !== confirmPassword){
         mensajeDiv.textContent = "Las contraseñas no coinciden ❌";
@@ -66,11 +66,11 @@ document.getElementById("registerForm").addEventListener("submit", async functio
         return;
     }
 
-    try {
-        const res = await fetch("/api/usuarios", { // relativo a Render
+    try{
+        const res = await fetch("/api/usuarios", {
             method:"POST",
             headers:{"Content-Type":"application/json"},
-            body: JSON.stringify({nombre, correo, password})
+            body: JSON.stringify({ nombre, correo, password })
         });
         const data = await res.json();
         if(!res.ok){
