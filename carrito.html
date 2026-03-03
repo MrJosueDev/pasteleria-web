@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Carrito | José María</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+*{ box-sizing:border-box; }
+body { margin:0; font-family: Arial, sans-serif; background: linear-gradient(135deg,#fff0f5,#ffe4ec); }
+header { background: linear-gradient(90deg,#ff4d88,#ff7aa2); padding: 15px 40px; color: white; }
+h1 { margin: 0; font-family: Georgia, serif; font-weight: normal; }
+.carrito-container { max-width: 900px; margin: 40px auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
+h2 { color: #ff4d88; margin-bottom: 20px; }
+.item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding: 15px 0; }
+.item-info { display: flex; align-items: center; gap: 15px; }
+.item-info img { width: 60px; height: 60px; object-fit: cover; border-radius: 12px; }
+.item-info p{ margin:5px 0 0 0; color:#777; }
+.item-controls { display: flex; align-items: center; gap: 10px; }
+.cantidad-btn, .eliminar-btn { border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; transition:0.3s; }
+.cantidad-btn { background: #ff4d88; color: white; }
+.cantidad-btn:hover{ background:#e6005c; }
+.eliminar-btn { background: #b30059; color: white; }
+.eliminar-btn:hover{ background:#800040; }
+.total { text-align: right; font-size: 22px; font-weight: bold; margin-top: 25px; color: #ff4d88; }
+.acciones { display: flex; justify-content: space-between; margin-top: 30px; }
+.btn { padding: 12px 22px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition:0.3s; }
+.volver-btn { background: #ffc1d6; color: #b30059; }
+.volver-btn:hover{ background:#ff9fbe; }
+.pagar-btn { background: #ff4d88; color: white; }
+.pagar-btn:hover{ background:#e6005c; }
+.carrito-vacio { text-align: center; padding: 40px; color: #777; }
+@media(max-width:700px){
+    .item{ flex-direction:column; align-items:flex-start; gap:10px; }
+    .acciones{ flex-direction:column; gap:15px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+    <h1>Carrito de Compras 🛒</h1>
+</header>
+
+<div class="carrito-container">
+    <h2>Productos en tu carrito</h2>
+    <div id="listaCarrito"></div>
+    <div class="total">Total: $<span id="total">0.00</span></div>
+    <div class="acciones">
+        <button class="btn volver-btn" onclick="volverInicio()">← Seguir Comprando</button>
+        <button class="btn pagar-btn" onclick="procederPago()">Proceder al Pago 💳</button>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", cargarCarrito);
+
+function cargarCarrito() {
+    const lista = document.getElementById("listaCarrito");
+    let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+    lista.innerHTML = "";
+
+    if (carrito.length === 0) {
+        lista.innerHTML = '<div class="carrito-vacio">Tu carrito está vacío 🛍️</div>';
+        document.getElementById("total").textContent = "0.00";
+        return;
+    }
+
+    carrito.forEach((producto, index) => {
+        const item = document.createElement("div");
+        item.classList.add("item");
+
+        // Usamos directamente la imagen guardada en localStorage
+        const imgSrc = producto.imagen || "imagenes/logo.jpeg"; // fallback por si no tiene imagen
+        let nombreMostrado = producto.nombre;
+        if(producto.opcion) nombreMostrado += " - " + producto.opcion;
+
+        item.innerHTML = `
+            <div class="item-info">
+                <img src="${imgSrc}" alt="${nombreMostrado}">
+                <div>
+                    <strong>${nombreMostrado}</strong>
+                    <p>Precio: $${Number(producto.precio).toFixed(2)}</p>
+                </div>
+            </div>
+            <div class="item-controls">
+                <button class="cantidad-btn" onclick="cambiarCantidad(${index}, -1)">-</button>
+                <span>${producto.cantidad}</span>
+                <button class="cantidad-btn" onclick="cambiarCantidad(${index}, 1)">+</button>
+                <button class="eliminar-btn" onclick="eliminarItem(${index})">Eliminar</button>
+            </div>
+        `;
+        lista.appendChild(item);
+    });
+
+    actualizarTotal();
+}
+
+function cambiarCantidad(index, cambio) {
+    let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+    carrito[index].cantidad += cambio;
+    if (carrito[index].cantidad <= 0) carrito.splice(index, 1);
+    localStorage.setItem("carrito", JSON.stringify(carrito));
+    cargarCarrito();
+}
+
+function eliminarItem(index) {
+    let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+    carrito.splice(index, 1);
+    localStorage.setItem("carrito", JSON.stringify(carrito));
+    cargarCarrito();
+}
+
+function actualizarTotal() {
+    let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+    let total = carrito.reduce((acc, item) => acc + (Number(item.precio) * item.cantidad), 0);
+    document.getElementById("total").textContent = total.toFixed(2);
+}
+
+function volverInicio() { window.location.href = "index.html"; }
+
+function procederPago() {
+    let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+    if (carrito.length === 0) { alert("Tu carrito está vacío 🛍️"); return; }
+    window.location.href = "./pagos.html";
+}
+</script>
+
+</body>
+</html>

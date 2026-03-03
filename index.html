@@ -1,0 +1,204 @@
+<!-- index.html actualizado -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>José Maria | Repostería</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+/* ====== Reset básico ====== */
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Arial', sans-serif; }
+
+/* ====== Body ====== */
+body { background: linear-gradient(145deg, #fef6f0, #ffeef3); color: #333; line-height: 1.6; }
+
+/* ====== Header ====== */
+header { background: linear-gradient(90deg, #ff6a95, #ff9eb5); padding: 20px 50px; display: flex; justify-content: space-between; align-items: center; color: white; position: sticky; top: 0; z-index: 1000; box-shadow: 0 5px 20px rgba(0,0,0,0.2); border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; }
+.logo-area { display: flex; align-items: center; gap: 10px; }
+.logo-area img { height: 60px; border-radius: 10px; object-fit: cover; }
+header h1 { font-family: 'Georgia', serif; font-weight: bold; font-size: 2rem; }
+.user-area { display: flex; align-items: center; gap: 10px; }
+.user-area .btn { padding: 10px 18px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; transition: all 0.3s ease; }
+.user-area .btn:hover { opacity: 0.9; transform: translateY(-2px); }
+.nav-profile-pic { width: 46px; height: 46px; border-radius: 50%; border: 2px solid white; object-fit: cover; cursor: pointer; display: none; }
+
+/* ====== Botones ====== */
+.login-btn { background: #ffffff; color: #ff4d88; }
+.register-btn { background: #ff4d88; color: white; }
+.perfil-btn { background: #ffc1d6; color: #b30059; }
+.pedidos-btn { background: #ffe3ec; color: #b30059; }
+.carrito-btn { background: #fff0f5; color: #b30059; }
+.logout-btn { background: #b30059; color: white; }
+
+/* ====== Sección productos ====== */
+.productos { padding: 60px 20px; text-align: center; }
+.productos h2 { color: #ff4d88; margin-bottom: 50px; font-size: 2.2rem; letter-spacing: 1px; text-shadow: 1px 1px 3px rgba(0,0,0,0.1); }
+
+/* ====== Grid productos ====== */
+.grid-productos { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
+
+/* ====== Tarjeta producto ====== */
+.producto { background: #ffffff; padding: 25px; border-radius: 20px; box-shadow: 0 12px 25px rgba(0,0,0,0.15); transition: transform 0.3s, box-shadow 0.3s; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
+.producto:hover { transform: translateY(-8px); box-shadow: 0 18px 35px rgba(0,0,0,0.2); }
+.producto h3 { margin-bottom: 12px; color: #ff4d88; font-size: 1.4rem; }
+.producto p { font-size: 0.95rem; color: #555; flex-grow: 1; margin-bottom: 15px; }
+.precio { font-weight: bold; font-size: 1.2rem; color: #ff6a95; margin-bottom: 15px; }
+
+/* ====== Botón comprar ====== */
+.btn-comprar { background: linear-gradient(90deg, #ff6a95, #ff9eb5); color: white; padding: 12px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 5px 15px rgba(255,105,149,0.3); }
+.btn-comprar:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(255,105,149,0.4); }
+
+/* ====== Footer ====== */
+footer { text-align: center; padding: 30px 15px; background: linear-gradient(90deg,#ff9eb5,#ff6a95); color: white; font-size: 1rem; margin-top: 60px; border-top-left-radius: 12px; border-top-right-radius: 12px; letter-spacing: 0.5px; }
+
+/* ====== Responsive ====== */
+@media (max-width: 768px) { header { flex-direction: column; gap: 15px; padding: 20px; } .productos { padding: 50px 15px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+<div class="logo-area">
+<img src="imagenes/logo.jpeg" alt="Logo José Maria">
+<h1><strong>Maria José</strong></h1>
+</div>
+<div class="user-area">
+<button class="btn carrito-btn" onclick="irCarrito()">Carrito 🛒 (<span id="contadorCarrito">0</span>)</button>
+<img id="navProfilePic" src="https://via.placeholder.com/40" class="nav-profile-pic" onclick="irPerfil()">
+<button class="btn login-btn" onclick="location.href='login.html'">Iniciar Sesión</button>
+<button class="btn register-btn" onclick="location.href='register.html'">Registrarse</button>
+<button class="btn perfil-btn" onclick="irPerfil()">Mi Perfil</button>
+<button class="btn pedidos-btn" onclick="irPedidos()">Mis Pedidos</button>
+<button id="logoutBtn" class="btn logout-btn" style="display:none;">Cerrar Sesión</button>
+</div>
+</header>
+
+<section class="productos">
+<h2>Nuestros Productos</h2>
+<div class="grid-productos">
+    <div class="producto">
+        <img src="imagenes/quesadillas.jpeg" alt="Quesadilla" style="width:75%; display:block; margin:0 auto 15px auto; border-radius:15px;">
+        <h3>Quesadilla</h3>
+        <p>Deliciosa quesadilla artesanal.</p>
+        <div class="precio">$15.00</div>
+        <button class="btn-comprar" onclick="agregarAlCarrito('Quesadilla', 15, 'imagenes/quesadillas.jpeg')">Agregar al carrito</button>
+    </div>
+
+    <div class="producto">
+        <img src="imagenes/chocoflan.png" alt="Chocoflan" style="width:50%; display:block; margin:0 auto 15px auto; border-radius:15px;">
+        <h3>Chocoflan</h3>
+        <p>Delicioso pastel húmedo con cobertura cremosa.</p>
+        <div class="precio">$35.00</div>
+        <button class="btn-comprar" onclick="agregarAlCarrito('Chocoflan', 35, 'imagenes/chocoflan.png')">Agregar al carrito</button>
+    </div>
+
+    <div class="producto">
+        <img src="imagenes/relampagos.jpeg" alt="Relampagos" style="width:50%; display:block; margin:0 auto 15px auto; border-radius:15px;">
+        <h3>Relampagos</h3>
+        <p>Pack de 12 Relampagos.</p>
+        <div class="precio">$18.00</div>
+        <button class="btn-comprar" onclick="agregarAlCarrito('Relampagos', 18, 'imagenes/relampagos.jpeg')">Agregar al carrito</button>
+    </div>
+
+    <div class="producto">
+        <img src="imagenes/pan.png" alt="Pan de Masa Madre" style="width:50%; display:block; margin:0 auto 15px auto; border-radius:15px;">
+        <h3>Pan de Masa Madre</h3>
+        <p>Delicioso pan artesanal.</p>
+        <label for="tipo-pan" style="font-weight:bold; display:block; margin-bottom:5px;">Elegir tipo:</label>
+        <select id="tipo-pan" style="padding:5px 10px; border-radius:8px; margin-bottom:10px; width:100%;">
+            <option value="10" data-opcion="Normal">Normal ($10)</option>
+            <option value="12" data-opcion="Con Jalapeño">Con Jalapeño ($12)</option>
+        </select>
+        <div class="precio" id="precio-pan">$10.00</div>
+        <button class="btn-comprar" onclick="agregarAlCarritoPan()">Agregar al carrito</button>
+    </div>
+</div>
+</section>
+
+<footer>
+© 2026 José Maria - Todos los derechos reservados
+</footer>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const usuario = localStorage.getItem("usuario");
+    const fotoGuardada = localStorage.getItem("fotoPerfil");
+    const loginBtn = document.querySelector(".login-btn");
+    const registerBtn = document.querySelector(".register-btn");
+    const perfilBtn = document.querySelector(".perfil-btn");
+    const pedidosBtn = document.querySelector(".pedidos-btn");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const navImg = document.getElementById("navProfilePic");
+
+    if (usuario) {
+        loginBtn.style.display = "none";
+        registerBtn.style.display = "none";
+        perfilBtn.style.display = "inline-block";
+        pedidosBtn.style.display = "inline-block";
+        logoutBtn.style.display = "inline-block";
+        if (fotoGuardada) { navImg.src = fotoGuardada; navImg.style.display = "block"; }
+        logoutBtn.addEventListener("click", function() {
+            localStorage.removeItem("usuario");
+            alert("Sesión cerrada correctamente 👋");
+            window.location.reload();
+        });
+    } else {
+        perfilBtn.style.display = "none";
+        pedidosBtn.style.display = "none";
+        logoutBtn.style.display = "none";
+        navImg.style.display = "none";
+    }
+
+    actualizarContador();
+});
+
+// Actualiza contador de carrito
+function actualizarContador() {
+    let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+    let totalCantidad = carrito.reduce((acc, item) => acc + item.cantidad, 0);
+    document.getElementById("contadorCarrito").textContent = totalCantidad;
+}
+
+// Agregar productos sin opciones
+function agregarAlCarrito(nombre, precio, imagen) {
+    let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+    const productoExistente = carrito.find(p => p.nombre === nombre && !p.opcion);
+    if (productoExistente) {
+        productoExistente.cantidad += 1;
+    } else {
+        carrito.push({ nombre, precio, cantidad: 1, imagen });
+    }
+    localStorage.setItem("carrito", JSON.stringify(carrito));
+    actualizarContador();
+    alert("Producto agregado al carrito 🛒✨");
+}
+
+// Agregar Pan de Masa Madre con opción
+function agregarAlCarritoPan() {
+    const select = document.getElementById("tipo-pan");
+    const precio = parseInt(select.value);
+    const opcion = select.options[select.selectedIndex].dataset.opcion;
+    const imagen = "imagenes/pan.png";
+    let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+    const productoExistente = carrito.find(p => p.nombre === "Pan de Masa Madre" && p.opcion === opcion);
+    if (productoExistente) { productoExistente.cantidad += 1; }
+    else { carrito.push({ nombre: "Pan de Masa Madre", precio, cantidad: 1, opcion, imagen }); }
+    localStorage.setItem("carrito", JSON.stringify(carrito));
+    actualizarContador();
+    alert(`Pan de Masa Madre - ${opcion} agregado al carrito 🛒✨`);
+}
+
+// Navegación
+function irPerfil() { window.location.href = "perfil.html"; }
+function irPedidos() { window.location.href = "mis-pedidos.html"; }
+function irCarrito() { window.location.href = "carrito.html"; }
+
+// Actualiza precio del Pan en la tarjeta
+document.getElementById("tipo-pan").addEventListener("change", function() {
+    document.getElementById("precio-pan").textContent = `$${this.value}.00`;
+});
+</script>
+
+</body>
+</html>

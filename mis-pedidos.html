@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Mis Pedidos | José Maria</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    body { margin:0; font-family: Arial, sans-serif; background:#fff8f5; }
+    header { background:#ff7aa2; padding:15px 30px; color:white; display:flex; justify-content:space-between; align-items:center; }
+    header h1 { margin:0; font-family:Georgia, serif; font-weight:normal; }
+    .container { padding:30px; max-width:900px; margin:auto; }
+    h2 { color:#ff4d88; margin-bottom:20px; }
+    .pedido { background:white; padding:20px; border-radius:10px; margin-bottom:20px; box-shadow:0 5px 15px rgba(0,0,0,0.1); transition: transform 0.2s; cursor:pointer; position:relative; }
+    .pedido:hover { transform: translateY(-5px); }
+    .pedido h3 { margin:0 0 10px; color:#ff4d88; }
+    .productos { margin-left:15px; display:none; margin-top:10px; }
+    .producto { margin-bottom:5px; }
+    .estado { font-weight:bold; margin-top:10px; display:inline-block; padding:3px 8px; border-radius:5px; color:white; }
+    .Pendiente { background:#f39c12; }
+    .procesando { background:#3498db; }
+    .completado { background:#2ecc71; }
+    .Enviado { background:#2ecc71; }
+    .Entregado { background:#27ae60; }
+    .Cancelado { background:#e74c3c; }
+    .sin-pedidos { text-align:center; margin-top:40px; font-size:18px; color:#666; }
+    .btn-flotante { position:fixed; bottom:30px; right:30px; background:#ff4d88; color:white; border:none; border-radius:50%; width:60px; height:60px; font-size:28px; font-weight:bold; cursor:pointer; box-shadow:0 5px 15px rgba(0,0,0,0.2); }
+    .btn-flotante:hover { opacity:0.9; }
+    .deleteBtn { position:absolute; top:15px; right:15px; background:#e74c3c; border:none; color:white; padding:6px 10px; border-radius:6px; cursor:pointer; }
+    .deleteBtn:hover { opacity:0.9; }
+    #notif-estado { 
+        position: fixed; 
+        top: 10px; 
+        right: 10px; 
+        background: #ff4d88; 
+        color: white; 
+        padding: 10px 20px; 
+        border-radius: 8px; 
+        display: none; 
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        z-index: 999;
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <h1>Pastelería José Maria</h1>
+    <button onclick="volverInicio()">Inicio</button>
+</header>
+
+<div class="container">
+    <h2>Mis Pedidos</h2>
+    <div id="listaPedidos"></div>
+</div>
+
+<button class="btn-flotante" onclick="nuevoPedido()">+</button>
+
+<div id="notif-estado"></div>
+
+<script>
+const API = "http://localhost:5000";
+const usuario = JSON.parse(localStorage.getItem("usuario"));
+
+if (!usuario) {
+    alert("Debes iniciar sesión primero.");
+    window.location.href = "login.html";
+}
+
+const listaPedidos = document.getElementById("listaPedidos");
+
+document.addEventListener("DOMContentLoaded", cargarPedidos);
+
+async function cargarPedidos() {
+    try {
+        const response = await fetch(`${API}/api/pedidos/${usuario.correo}`);
+        const pedidos = await response.json();
+        renderPedidos(pedidos);
+    } catch (error) {
+        listaPedidos.innerHTML = "<p>Error al cargar pedidos.</p>";
+    }
+}
+
+function renderPedidos(pedidos) {
+    listaPedidos.innerHTML = "";
+
+    if (!pedidos.length) {
+        listaPedidos.innerHTML = `<div class="sin-pedidos">Aún no has realizado ningún pedido 🧁</div>`;
+        return;
+    }
+
+    pedidos.forEach((pedido, index) => {
+        const pedidoDiv = document.createElement("div");
+        pedidoDiv.classList.add("pedido");
+        pedidoDiv.id = `pedido-${pedido._id}`;
+
+        pedidoDiv.innerHTML = `
+            <h3>Pedido #${index + 1} - ${new Date(pedido.createdAt).toLocaleDateString()}</h3>
+            <div class="estado ${pedido.estado}">
+                ${pedido.estado}
+            </div>
+            <div class="productos">
+                ${pedido.productos.map(p => `
+                    <div class="producto">
+                        • ${p.nombre} x${p.cantidad} - $${p.precio}
+                    </div>
+                `).join("")}
+                <div><strong>Total: $${pedido.total}</strong></div>
+            </div>
+            <button class="deleteBtn" onclick="eliminarPedido('${pedido._id}')">Eliminar</button>
+        `;
+
+        pedidoDiv.addEventListener("click", (e) => {
+            if(e.target.classList.contains("deleteBtn")) return;
+            const productosDiv = pedidoDiv.querySelector(".productos");
+            productosDiv.style.display = productosDiv.style.display === "block" ? "none" : "block";
+        });
+
+        listaPedidos.appendChild(pedidoDiv);
+    });
+}
+
+async function eliminarPedido(id){
+    if(!confirm("¿Deseas eliminar este pedido? ❌")) return;
+
+    try {
+        const res = await fetch(`${API}/api/pedidos/${id}`, {
+            method: "DELETE"
+        });
+        if(!res.ok){
+            alert("Error al eliminar el pedido");
+            return;
+        }
+
+        // Quitar del DOM
+        const tarjeta = document.getElementById(`pedido-${id}`);
+        if(tarjeta) tarjeta.remove();
+
+    } catch(err){
+        console.error(err);
+        alert("Error de conexión con el servidor");
+    }
+}
+
+function volverInicio() {
+    window.location.href = "index.html";
+}
+
+function nuevoPedido() {
+    window.location.href = "index.html";
+}
+</script>
+
+</body>
+</html>

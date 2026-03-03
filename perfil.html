@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Mi Perfil | José Maria</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <h1>Pastelería <strong>José Maria</strong></h1>
+</header>
+
+<div class="perfil-container">
+    <h2>Mi Perfil</h2>
+
+    <img id="fotoActual" src="https://via.placeholder.com/150" class="perfil-img">
+
+    <div class="input-group">
+        <label>Nombre</label>
+        <p id="nombreUsuario" class="readonly-input"></p>
+    </div>
+
+    <div class="input-group">
+        <label>Correo</label>
+        <p id="correoUsuario" class="readonly-input"></p>
+    </div>
+
+    <div class="input-group">
+        <label>Cambiar foto de perfil</label>
+        <input type="file" id="fotoPerfil" accept="image/*">
+    </div>
+
+    <div id="mensaje" class="mensaje"></div>
+
+    <button class="btn cerrar" onclick="cerrarSesion()">Cerrar Sesión</button>
+    <button class="btn volver" onclick="volverInicio()">Volver al Inicio</button>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const usuario = JSON.parse(localStorage.getItem("usuario"));
+    if (!usuario) {
+        alert("Debes iniciar sesión primero");
+        window.location.href = "login.html";
+        return;
+    }
+
+    const nombreP = document.getElementById("nombreUsuario");
+    const correoP = document.getElementById("correoUsuario");
+    const fotoActual = document.getElementById("fotoActual");
+    const mensajeDiv = document.getElementById("mensaje");
+
+    // Mostrar datos
+    nombreP.textContent = usuario.nombre;
+    correoP.textContent = usuario.correo;
+
+    const fotoGuardada = localStorage.getItem("fotoPerfil");
+    if (fotoGuardada) fotoActual.src = fotoGuardada;
+
+    // Cambiar foto
+    document.getElementById("fotoPerfil").addEventListener("change", function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+            const img = new Image();
+            img.src = ev.target.result;
+            img.onload = function() {
+                const canvas = document.createElement("canvas");
+                const ctx = canvas.getContext("2d");
+                const size = 150;
+                canvas.width = size;
+                canvas.height = size;
+                ctx.drawImage(img, 0, 0, size, size);
+                const compressed = canvas.toDataURL("image/jpeg", 0.7);
+                localStorage.setItem("fotoPerfil", compressed);
+                fotoActual.src = compressed;
+                mensajeDiv.textContent = "Foto actualizada ✅";
+                mensajeDiv.className = "mensaje success";
+            };
+        };
+        reader.readAsDataURL(file);
+    });
+});
+
+function volverInicio() { window.location.href = "index.html"; }
+function cerrarSesion() {
+    localStorage.removeItem("usuario");
+    localStorage.removeItem("fotoPerfil");
+    alert("Sesión cerrada 👋");
+    window.location.href = "login.html";
+}
+</script>
+
+</body>
+</html>

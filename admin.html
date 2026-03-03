@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Panel Admin - Pastelería</title>
+
+<style>
+body{
+    margin:0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg,#141e30,#243b55);
+    color:white;
+    display:flex;
+    min-height:100vh;
+}
+
+.sidebar{
+    width:230px;
+    background:#0f172a;
+    padding:25px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+}
+
+.sidebar h2{
+    text-align:center;
+}
+
+.sidebar button{
+    padding:10px;
+    border:none;
+    border-radius:8px;
+    background:#c0392b;
+    color:white;
+    cursor:pointer;
+}
+
+.main{
+    flex:1;
+    padding:40px;
+}
+
+.card{
+    background:#1e293b;
+    padding:20px;
+    border-radius:12px;
+    margin-bottom:20px;
+}
+
+select{
+    padding:5px;
+    border-radius:6px;
+    border:none;
+}
+
+.deleteBtn{
+    padding:8px 12px;
+    background:#e74c3c;
+    border:none;
+    border-radius:6px;
+    color:white;
+    cursor:pointer;
+    margin-top:10px;
+}
+.deleteBtn:hover{
+    opacity:0.9;
+}
+
+.ubicacionBtn{
+    padding:8px 12px;
+    background:#38bdf8;
+    border:none;
+    border-radius:6px;
+    color:white;
+    cursor:pointer;
+    margin-top:10px;
+}
+.ubicacionBtn:hover{
+    opacity:0.9;
+}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+    <h2>ADMIN</h2>
+    <button id="logoutBtn">Cerrar sesión</button>
+</div>
+
+<div class="main">
+    <h1>Panel de Administración</h1>
+    <div id="pedidosContainer"></div>
+</div>
+
+<script>
+const API = "http://localhost:5000";
+const usuario = JSON.parse(localStorage.getItem("usuario"));
+
+if(!usuario || usuario.role !== "admin"){
+    alert("Acceso solo para administradores");
+    window.location.href = "login.html";
+}
+
+// ======================
+// CARGAR PEDIDOS
+// ======================
+async function cargarPedidos(){
+    try{
+        const res = await fetch(`${API}/api/pedidos`);
+        const pedidos = await res.json();
+
+        const container = document.getElementById("pedidosContainer");
+        container.innerHTML = "";
+
+        if(pedidos.length === 0){
+            container.innerHTML = "<p>No hay pedidos aún.</p>";
+            return;
+        }
+
+        pedidos.forEach(pedido => {
+
+            let productosHTML = "";
+            pedido.productos.forEach(p => {
+                productosHTML += `<li>${p.nombre} x${p.cantidad} - $${p.precio}</li>`;
+            });
+
+            // Extraer coordenadas si existen
+            let coords = "";
+            if(pedido.direccion.includes("Lat:") && pedido.direccion.includes("Lon:")){
+                const parts = pedido.direccion.match(/Lat: ([0-9\.\-]+), Lon: ([0-9\.\-]+)/);
+                if(parts){
+                    coords = { lat: parts[1], lon: parts[2] };
+                }
+            }
+
+            container.innerHTML += `
+            <div class="card" id="pedido-${pedido._id}">
+                <h3>Pedido de ${pedido.nombreCliente}</h3>
+                <p><strong>Correo:</strong> ${pedido.usuario}</p>
+                <p><strong>Dirección:</strong> ${pedido.direccion}</p>
+                <p><strong>Total:</strong> $${pedido.total}</p>
+                <p><strong>Estado:</strong> 
+                    <select onchange="cambiarEstado('${pedido._id}', this.value)">
+                        <option ${pedido.estado==="Pendiente"?"selected":""}>Pendiente</option>
+                        <option ${pedido.estado==="Enviado"?"selected":""}>Enviado</option>
+                        <option ${pedido.estado==="Entregado"?"selected":""}>Entregado</option>
+                    </select>
+                </p>
+                <p><strong>Productos:</strong></p>
+                <ul>${productosHTML}</ul>
+                ${coords ? `<button class="ubicacionBtn" onclick="verUbicacion('${coords.lat}','${coords.lon}')">Ver Ubicación</button>` : ""}
+                <button class="deleteBtn" onclick="eliminarPedido('${pedido._id}')">Eliminar Pedido</button>
+            </div>
+            `;
+        });
+
+    }catch(error){
+        alert("Error cargando pedidos");
+    }
+}
+
+// ======================
+// CAMBIAR ESTADO
+// ======================
+async function cambiarEstado(id, nuevoEstado){
+    await fetch(`${API}/api/pedidos/${id}`,{
+        method:"PUT",
+        headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify({ estado: nuevoEstado })
+    });
+    cargarPedidos();
+}
+
+// ======================
+// ELIMINAR PEDIDO
+// ======================
+async function eliminarPedido(id){
+    if(!confirm("¿Deseas eliminar este pedido? ❌")) return;
+
+    try{
+        const res = await fetch(`${API}/api/pedidos/${id}`, {
+            method: "DELETE"
+        });
+
+        if(!res.ok){
+            alert("Error al eliminar el pedido");
+            return;
+        }
+
+        const tarjeta = document.getElementById(`pedido-${id}`);
+        if(tarjeta) tarjeta.remove();
+
+    }catch(err){
+        console.error(err);
+        alert("Error de conexión con el servidor");
+    }
+}
+
+// ======================
+// VER UBICACIÓN
+// ======================
+function verUbicacion(lat, lon){
+    window.open(`https://www.google.com/maps?q=${lat},${lon}`, "_blank");
+}
+
+// ======================
+document.getElementById("logoutBtn").addEventListener("click", ()=>{
+    localStorage.clear();
+    window.location.href = "login.html";
+});
+
+cargarPedidos();
+</script>
+
+</body>
+</html>
