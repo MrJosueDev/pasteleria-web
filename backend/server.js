@@ -1,4 +1,4 @@
-// server.js - Versión final para Render con frontend en public/
+// server.js - Versión final para Render con frontend en public y rutas HTML explícitas
 require('dotenv').config();
 const express = require("express");
 const mongoose = require("mongoose");
@@ -18,7 +18,6 @@ app.use(express.json());
 /* ========================
    📂 CONFIGURAR FRONTEND
 ======================== */
-// Como server.js está en backend/, subimos un nivel y apuntamos a public/
 const FRONTEND_PATH = path.join(__dirname, "..", "public");
 app.use(express.static(FRONTEND_PATH));
 
@@ -26,11 +25,18 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(FRONTEND_PATH, "index.html"));
 });
 
+// Rutas explícitas para cada HTML
+const htmlPages = ["login", "register", "admin", "carrito", "mis-pedidos", "pagos", "perfil"];
+htmlPages.forEach(page => {
+  app.get(`/${page}.html`, (req, res) => {
+    res.sendFile(path.join(FRONTEND_PATH, `${page}.html`));
+  });
+});
+
 /* ========================
-   🗄 CONEXIÓN MONGODB ATLAS
+   🗄 CONEXIÓN MONGODB
 ======================== */
 const mongoURI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/pasteleria";
-
 mongoose.connect(mongoURI)
   .then(() => console.log("✅ MongoDB conectado"))
   .catch(err => console.error("❌ Error MongoDB:", err));
