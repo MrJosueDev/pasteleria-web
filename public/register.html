@@ -90,9 +90,8 @@ document.getElementById("registerForm").addEventListener("submit", async functio
     }
 
     try {
-        // ✅ URL dinámica para local y Render
-        const API_URL = window.location.origin + "/api/usuarios";
-        const res = await fetch(API_URL, {
+        // URL completa del backend en Render
+        const res = await fetch("https://pasteleria-web-9awq.onrender.com/api/usuarios", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ nombre, correo, password })
@@ -114,6 +113,7 @@ document.getElementById("registerForm").addEventListener("submit", async functio
         }, 1500);
 
     } catch (err) {
+        console.error(err);
         mensajeDiv.textContent = "Error de conexión con el servidor ❌";
         mensajeDiv.className = "error";
     }
