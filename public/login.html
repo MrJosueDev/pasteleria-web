@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Login - Pastelería</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 body {
@@ -53,8 +54,7 @@ input:focus { border-color: #ff4d88; }
 </div>
 
 <script>
-// 🔥 Cambiar API a la URL de tu backend en Render
-const API = "https://pasteleria-web-9awq.onrender.com";
+const API = "https://TU-BACKEND-URL.onrender.com"; // 🔥 REEMPLAZA con tu URL de backend Render
 
 // Si ya está logueado, redirige automáticamente
 const usuarioGuardado = JSON.parse(localStorage.getItem("usuario"));
@@ -88,7 +88,7 @@ async function login(){
             return;
         }
 
-        // Guardar usuario
+        // Guardar usuario en localStorage
         localStorage.setItem("usuario", JSON.stringify(data.usuario));
 
         mensajeDiv.textContent = "Login exitoso ✅ Redirigiendo...";
@@ -103,7 +103,6 @@ async function login(){
         }, 1000);
 
     } catch(error){
-        console.error(error);
         mensajeDiv.textContent = "Error de conexión con el servidor ❌";
         mensajeDiv.className = "error";
     }
