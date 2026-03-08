@@ -53,25 +53,35 @@ document.getElementById("registerForm").addEventListener("submit", async functio
     const password = document.getElementById("password").value;
     const confirmPassword = document.getElementById("confirmPassword").value;
     const mensajeDiv = document.getElementById("mensaje");
-    mensajeDiv.textContent = ""; mensajeDiv.className = "";
+    mensajeDiv.textContent = ""; 
+    mensajeDiv.className = "";
 
     if(password !== confirmPassword){
-        mensajeDiv.textContent = "Las contraseñas no coinciden ❌"; mensajeDiv.className="error";
+        mensajeDiv.textContent = "Las contraseñas no coinciden ❌"; 
+        mensajeDiv.className = "error";
         return;
     }
 
     try{
         const res = await fetch("/api/usuarios", {
-            method:"POST",
-            headers: { "Content-Type":"application/json" },
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ nombre, correo, password })
         });
+
         const data = await res.json();
-        if(!res.ok){ mensajeDiv.textContent=data.mensaje||"Error en el registro ❌"; mensajeDiv.className="error"; return; }
-        mensajeDiv.textContent="Registro exitoso ✅ Redirigiendo..."; mensajeDiv.className="success";
-        setTimeout(()=>{ window.location.href="login.html"; },1500);
-    } catch(err){
-        mensajeDiv.textContent="Error de conexión con el servidor ❌"; mensajeDiv.className="error";
+
+        // Siempre muestra el mensaje del servidor
+        mensajeDiv.textContent = data.mensaje || (res.ok ? "Registro exitoso ✅" : "Error desconocido ❌");
+        mensajeDiv.className = res.ok ? "success" : "error";
+
+        if (res.ok) {
+            setTimeout(() => { window.location.href = "login.html"; }, 1500);
+        }
+    } catch (err) {
+        mensajeDiv.textContent = "Error de conexión real (network): " + err.message;
+        mensajeDiv.className = "error";
+        console.error("Fetch error:", err);
     }
 });
 </script>
