@@ -1,10 +1,9 @@
-// server.js - Versión corregida para Render (sin PathError y path correcto)
+// server.js - Versión fija para Render (no PathError, path correcto, fallback middleware)
 require('dotenv').config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const path = require("path");
-const fs = require("fs");  // para verificar archivos
 const bcrypt = require("bcrypt");
 
 const app = express();
@@ -15,7 +14,7 @@ console.log("Iniciando servidor en Render...");
 /* ========================
    🔥 MIDDLEWARES
 ======================== */
-app.use(cors());
+app.use(cors({ origin: '*' })); // Permite CORS desde cualquier origen (temporal para pruebas)
 app.use(express.json());
 
 /* ========================
@@ -24,63 +23,36 @@ app.use(express.json());
 const FRONTEND_PATH = path.join(__dirname, '..', 'public');
 console.log("Ruta frontend configurada:", FRONTEND_PATH);
 
-// Verificar si la carpeta existe
-if (!fs.existsSync(FRONTEND_PATH)) {
-  console.error("❌ Carpeta public NO encontrada en:", FRONTEND_PATH);
-} else {
-  console.log("✅ Carpeta public encontrada");
-}
-
 app.use(express.static(FRONTEND_PATH));
 
-// Ruta raíz: sirve index.html
+// Ruta raíz
 app.get("/", (req, res) => {
-  const file = path.join(FRONTEND_PATH, "index.html");
-  if (fs.existsSync(file)) {
-    res.sendFile(file);
-  } else {
-    res.status(404).send("index.html no encontrado");
-  }
+  res.sendFile(path.join(FRONTEND_PATH, "index.html"));
 });
 
-// Rutas explícitas para cada HTML
+// Rutas explícitas para páginas HTML
 const htmlPages = ["login", "register", "admin", "carrito", "mis-pedidos", "pagos", "perfil"];
 htmlPages.forEach(page => {
   app.get(`/${page}.html`, (req, res) => {
-    const file = path.join(FRONTEND_PATH, `${page}.html`);
-    if (fs.existsSync(file)) {
-      res.sendFile(file);
-    } else {
-      res.status(404).send(`${page}.html no encontrado`);
-    }
+    res.sendFile(path.join(FRONTEND_PATH, `${page}.html`));
   });
 });
 
-// Catch-all middleware para fallback (sin usar app.get("*"))
-app.use((req, res, next) => {
-  const file = path.join(FRONTEND_PATH, "index.html");
-  if (fs.existsSync(file)) {
-    res.sendFile(file);
-  } else {
-    res.status(404).send("Página no encontrada - fallback falló");
-  }
+// Fallback seguro (middleware, no app.get("*"))
+app.use((req, res) => {
+  res.sendFile(path.join(FRONTEND_PATH, "index.html"));
 });
 
 /* ========================
-   🗄 CONEXIÓN MONGODB
+   🗄 CONEXIÓN MONGODB - No crashea si falla
 ======================== */
 const mongoURI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/pasteleria";
-console.log("Intentando conectar a MongoDB...");
-
 mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log("✅ MongoDB conectado exitosamente"))
-  .catch(err => {
-    console.error("❌ Error al conectar a MongoDB:", err.message);
-    // NO process.exit(1);  // para que el server siga corriendo y veamos el frontend
-  });
+  .then(() => console.log("✅ MongoDB conectado"))
+  .catch(err => console.error("❌ Error MongoDB:", err.message));  // No exit
 
 /* ========================
-   📦 MODELOS (sin cambios)
+   📦 MODELOS (igual)
 ======================== */
 const usuarioSchema = new mongoose.Schema({
   nombre: String,
@@ -102,25 +74,25 @@ const pedidoSchema = new mongoose.Schema({
 const Pedido = mongoose.model("Pedido", pedidoSchema);
 
 /* ========================
-   RUTAS USUARIOS y PEDIDOS (sin cambios, pero con logs)
+   RUTAS (igual, con logs extra)
 ======================== */
-// ... (copia todas tus rutas de usuarios y pedidos del código original aquí, solo agrega console.error si quieres más debug)
-
-// Ejemplo para /api/usuarios:
 app.post("/api/usuarios", async (req, res) => {
   try {
-    // tu código original...
+    const { nombre, correo, password } = req.body;
+    const existe = await Usuario.findOne({ correo });
+    if (existe) return res.status(400).json({ mensaje: "Correo ya registrado" });
+    const hash = await bcrypt.hash(password, 10);
+    const nuevoUsuario = new Usuario({ nombre, correo, password: hash });
+    await nuevoUsuario.save();
+    res.status(201).json({ mensaje: "Usuario creado", usuario: { nombre, correo, role: nuevoUsuario.role } });
   } catch (err) {
-    console.error("Error en /api/usuarios:", err.message);
+    console.error("Error /api/usuarios:", err.message);
     res.status(500).json({ mensaje: "Error al crear usuario" });
   }
 });
 
-// (pega el resto igual)
+// (pega el resto de rutas de login y pedidos igual que en tu original)
 
-/* ========================
-   🔥 SERVIDOR
-======================== */
 app.listen(PORT, () => {
-  console.log(`🔥 Servidor corriendo en puerto ${PORT}`);
+  console.log(`🔥 Servidor en puerto ${PORT}`);
 });
