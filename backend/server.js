@@ -1,4 +1,3 @@
-// server.js - Versión FINAL corregida para Render (sin PathError, path correcto, CORS explícito, fallback middleware)
 require('dotenv').config();
 const express = require("express");
 const mongoose = require("mongoose");
@@ -12,69 +11,13 @@ const PORT = process.env.PORT || 5000;
 console.log("Iniciando servidor en Render...");
 
 /* ========================
-   🔥 MIDDLEWARES
+   🔥 MIDDLEWARES (primero)
 ======================== */
-app.use(cors({ origin: '*' }));  // Permite desde cualquier origen (temporal, luego pon tu dominio)
+app.use(cors({ origin: '*' }));  // Permite cualquier origen (temporal para pruebas)
 app.use(express.json());
 
 /* ========================
-   📂 CONFIGURAR FRONTEND
-======================== */
-const FRONTEND_PATH = path.join(__dirname, '..', 'public');
-console.log("Ruta frontend:", FRONTEND_PATH);
-
-app.use(express.static(FRONTEND_PATH));
-
-// Ruta raíz
-app.get("/", (req, res) => {
-  res.sendFile(path.join(FRONTEND_PATH, "index.html"));
-});
-
-// Rutas explícitas HTML
-const htmlPages = ["login", "register", "admin", "carrito", "mis-pedidos", "pagos", "perfil"];
-htmlPages.forEach(page => {
-  app.get(`/${page}.html`, (req, res) => {
-    res.sendFile(path.join(FRONTEND_PATH, `${page}.html`));
-  });
-});
-
-// Fallback seguro como middleware (evita PathError)
-app.use((req, res, next) => {
-  res.sendFile(path.join(FRONTEND_PATH, "index.html"));
-});
-
-/* ========================
-   🗄 CONEXIÓN MONGODB
-======================== */
-const mongoURI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/pasteleria";
-mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log("✅ MongoDB conectado"))
-  .catch(err => console.error("❌ Error MongoDB:", err.message));  // No crashea
-
-/* ========================
-   MODELOS
-======================== */
-const usuarioSchema = new mongoose.Schema({
-  nombre: String,
-  correo: { type: String, unique: true },
-  password: String,
-  role: { type: String, default: "cliente" }
-});
-const Usuario = mongoose.model("Usuario", usuarioSchema);
-
-const pedidoSchema = new mongoose.Schema({
-  usuario: String,
-  nombreCliente: String,
-  direccion: String,
-  productos: [{ nombre: String, precio: Number, cantidad: Number }],
-  total: Number,
-  estado: { type: String, default: "Pendiente" },
-  createdAt: { type: Date, default: Date.now }
-});
-const Pedido = mongoose.model("Pedido", pedidoSchema);
-
-/* ========================
-   RUTAS (con logs extra)
+   RUTAS API (antes de static y fallback)
 ======================== */
 app.post("/api/usuarios", async (req, res) => {
   console.log("POST /api/usuarios recibido:", req.body);
@@ -107,8 +50,67 @@ app.post("/api/login", async (req, res) => {
   }
 });
 
-// (agrega aquí tus otras rutas de pedidos igual que antes)
+// Agrega aquí tus rutas de pedidos si las tienes (post, get, put, delete /api/pedidos...)
 
+/* ========================
+   📂 CONFIGURAR FRONTEND (después de API)
+======================== */
+const FRONTEND_PATH = path.join(__dirname, '..', 'public');
+console.log("Ruta frontend:", FRONTEND_PATH);
+
+app.use(express.static(FRONTEND_PATH));
+
+// Ruta raíz
+app.get("/", (req, res) => {
+  res.sendFile(path.join(FRONTEND_PATH, "index.html"));
+});
+
+// Rutas explícitas para HTML
+const htmlPages = ["login", "register", "admin", "carrito", "mis-pedidos", "pagos", "perfil"];
+htmlPages.forEach(page => {
+  app.get(`/${page}.html`, (req, res) => {
+    res.sendFile(path.join(FRONTEND_PATH, `${page}.html`));
+  });
+});
+
+// Fallback (solo para frontend, al final)
+app.use((req, res) => {
+  res.sendFile(path.join(FRONTEND_PATH, "index.html"));
+});
+
+/* ========================
+   🗄 CONEXIÓN MONGODB (sin opciones depreciadas)
+======================== */
+const mongoURI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/pasteleria";
+mongoose.connect(mongoURI)
+  .then(() => console.log("✅ MongoDB conectado"))
+  .catch(err => console.error("❌ Error MongoDB:", err.message));
+
+/* ========================
+   📦 MODELOS
+======================== */
+const usuarioSchema = new mongoose.Schema({
+  nombre: String,
+  correo: { type: String, unique: true },
+  password: String,
+  role: { type: String, default: "cliente" }
+});
+const Usuario = mongoose.model("Usuario", usuarioSchema);
+
+const pedidoSchema = new mongoose.Schema({
+  usuario: String,
+  nombreCliente: String,
+  direccion: String,
+  productos: [{ nombre: String, precio: Number, cantidad: Number }],
+  total: Number,
+  estado: { type: String, default: "Pendiente" },
+  createdAt: { type: Date, default: Date.now }
+});
+const Pedido = mongoose.model("Pedido", pedidoSchema);
+
+/* ========================
+   🔥 SERVIDOR
+======================== */
 app.listen(PORT, () => {
-  console.log(`🔥 Servidor en puerto ${PORT}`);
+  console.log(`🔥 Servidor corriendo en puerto ${PORT}`);
 });
