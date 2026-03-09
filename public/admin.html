@@ -94,7 +94,7 @@ select{
 </div>
 
 <script>
-const API = "https://pasteleria-web-9awq.onrender.com";
+const API = "";  // Relativa: mismo dominio (funciona en local y producción)
 const usuario = JSON.parse(localStorage.getItem("usuario"));
 
 if(!usuario || usuario.role !== "admin"){
@@ -108,6 +108,9 @@ if(!usuario || usuario.role !== "admin"){
 async function cargarPedidos(){
     try{
         const res = await fetch(`${API}/api/pedidos`);
+        if (!res.ok) {
+            throw new Error(`Status ${res.status}: ${await res.text()}`);
+        }
         const pedidos = await res.json();
 
         const container = document.getElementById("pedidosContainer");
@@ -156,7 +159,8 @@ async function cargarPedidos(){
         });
 
     }catch(error){
-        alert("Error cargando pedidos");
+        alert("Error cargando pedidos: " + error.message);
+        console.error("Fetch error:", error);
     }
 }
 
@@ -164,12 +168,19 @@ async function cargarPedidos(){
 // CAMBIAR ESTADO
 // ======================
 async function cambiarEstado(id, nuevoEstado){
-    await fetch(`${API}/api/pedidos/${id}`,{
-        method:"PUT",
-        headers:{ "Content-Type":"application/json" },
-        body: JSON.stringify({ estado: nuevoEstado })
-    });
-    cargarPedidos();
+    try{
+        const res = await fetch(`${API}/api/pedidos/${id}`,{
+            method:"PUT",
+            headers:{ "Content-Type":"application/json" },
+            body: JSON.stringify({ estado: nuevoEstado })
+        });
+        if (!res.ok) {
+            throw new Error(`Status ${res.status}`);
+        }
+        cargarPedidos();
+    }catch(err){
+        alert("Error al cambiar estado: " + err.message);
+    }
 }
 
 // ======================
@@ -184,16 +195,15 @@ async function eliminarPedido(id){
         });
 
         if(!res.ok){
-            alert("Error al eliminar el pedido");
-            return;
+            throw new Error(`Status ${res.status}`);
         }
 
         const tarjeta = document.getElementById(`pedido-${id}`);
         if(tarjeta) tarjeta.remove();
 
     }catch(err){
-        console.error(err);
-        alert("Error de conexión con el servidor");
+        alert("Error al eliminar el pedido: " + err.message);
+        console.error("Delete error:", err);
     }
 }
 
