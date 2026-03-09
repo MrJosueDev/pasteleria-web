@@ -51,11 +51,6 @@ button:hover{ background:#e6005c; }
     color:#ff4d88;
     margin-bottom:20px;
 }
-#gpsBtn{
-    background:#38bdf8;
-    margin-bottom:15px;
-}
-#gpsBtn:hover{ background:#0ea5e9; }
 .mensaje-envio{
     color:#b30059;
     font-weight:bold;
@@ -86,8 +81,8 @@ button:hover{ background:#e6005c; }
     </div>
 
     <input type="text" id="nombre" placeholder="Nombre completo" required>
+    <input type="tel" id="telefono" placeholder="Número telefónico" required>
     <input type="text" id="direccion" placeholder="Dirección de entrega" required>
-    <button id="gpsBtn" onclick="usarUbicacion()">Usar mi ubicación GPS 📍</button>
 
     <!-- Mensaje de gastos de envío -->
     <p class="mensaje-envio">⚠️ Nota: Los gastos de envío correrán por tu cuenta.</p>
@@ -120,39 +115,17 @@ function calcularTotal(){
 }
 calcularTotal();
 
-// ====== Ubicación GPS con confirmación ======
-function usarUbicacion(){
-    if(confirm("¿Estás seguro que quieres usar tu ubicación? 📍")){
-        if(navigator.geolocation){
-            navigator.geolocation.getCurrentPosition(
-                pos => {
-                    const lat = pos.coords.latitude;
-                    const lon = pos.coords.longitude;
-                    document.getElementById("direccion").value = `Lat: ${lat}, Lon: ${lon}`;
-                    alert("✅ Ubicación obtenida correctamente");
-                },
-                err => {
-                    alert("No se pudo obtener la ubicación. Por favor escribe tu dirección manualmente.");
-                }
-            );
-        } else {
-            alert("Tu navegador no soporta geolocalización.");
-        }
-    } else {
-        alert("No se compartió la ubicación.");
-    }
-}
-
 // ====== Simular pago y guardar pedido ======
 async function confirmarPago(){
     const nombre = document.getElementById("nombre").value.trim();
+    const telefono = document.getElementById("telefono").value.trim();
     const direccion = document.getElementById("direccion").value.trim();
     const mensajeDiv = document.getElementById("mensaje");
     mensajeDiv.textContent = "";
     mensajeDiv.className = "";
 
-    if(!nombre || !direccion){
-        mensajeDiv.textContent = "Por favor completa nombre y dirección.";
+    if(!nombre || !telefono || !direccion){
+        mensajeDiv.textContent = "Por favor completa nombre, teléfono y dirección.";
         mensajeDiv.className = "error";
         return;
     }
@@ -162,6 +135,7 @@ async function confirmarPago(){
     const pedido = {
         usuario: usuario.correo,
         nombreCliente: nombre,
+        telefono: telefono,  // Nuevo campo
         direccion: direccion,
         productos: carrito,
         total: total
