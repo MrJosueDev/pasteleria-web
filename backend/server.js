@@ -50,19 +50,31 @@ app.post("/api/login", async (req, res) => {
   }
 });
 
-// NUEVA RUTA: GET para listar todos los pedidos (para admin.html)
+// RUTA PARA CREAR PEDIDO (desde pagos.html)
+app.post("/api/pedidos", async (req, res) => {
+  console.log("POST /api/pedidos recibido:", req.body);
+  try {
+    const { usuario, nombreCliente, direccion, productos, total } = req.body;
+    const nuevoPedido = new Pedido({ usuario, nombreCliente, direccion, productos, total });
+    await nuevoPedido.save();
+    res.status(201).json({ mensaje: "Pedido creado", pedido: nuevoPedido });
+  } catch (err) {
+    console.error("Error /api/pedidos POST:", err.message);
+    res.status(500).json({ mensaje: "Error al crear pedido" });
+  }
+});
+
+// RUTA PARA LISTAR TODOS LOS PEDIDOS (para admin.html)
 app.get("/api/pedidos", async (req, res) => {
   console.log("GET /api/pedidos recibido - cargando pedidos para admin");
   try {
     const pedidos = await Pedido.find().sort({ createdAt: -1 });
     res.json(pedidos);
   } catch (err) {
-    console.error("Error en GET /api/pedidos:", err.message);
+    console.error("Error /api/pedidos GET:", err.message);
     res.status(500).json({ mensaje: "Error al obtener pedidos" });
   }
 });
-
-// Agrega aquí otras rutas de pedidos (POST, PUT, DELETE) si las tenés
 
 /* ========================
    📂 CONFIGURAR FRONTEND (después de API)
