@@ -131,9 +131,8 @@ async function cargarPedidos(){
                 productosHTML += `<li>${p.nombre} x${p.cantidad} - $${p.precio}</li>`;
             });
 
-            // Extraer coordenadas si existen
             let coords = "";
-            if(pedido.direccion.includes("Lat:") && pedido.direccion.includes("Lon:")){
+            if(pedido.direccion && pedido.direccion.includes("Lat:") && pedido.direccion.includes("Lon:")){
                 const parts = pedido.direccion.match(/Lat: ([0-9\.\-]+), Lon: ([0-9\.\-]+)/);
                 if(parts){
                     coords = { lat: parts[1], lon: parts[2] };
@@ -144,6 +143,7 @@ async function cargarPedidos(){
             <div class="card" id="pedido-${pedido._id}">
                 <h3>Pedido de ${pedido.nombreCliente}</h3>
                 <p><strong>Correo:</strong> ${pedido.usuario}</p>
+                <p><strong>Teléfono:</strong> ${pedido.telefono || 'No proporcionado'}</p>
                 <p><strong>Dirección:</strong> ${pedido.direccion}</p>
                 <p><strong>Total:</strong> $${pedido.total}</p>
                 <p><strong>Estado:</strong> 
