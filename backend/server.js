@@ -54,8 +54,8 @@ app.post("/api/login", async (req, res) => {
 app.post("/api/pedidos", async (req, res) => {
   console.log("POST /api/pedidos recibido:", req.body);
   try {
-    const { usuario, nombreCliente, direccion, productos, total } = req.body;
-    const nuevoPedido = new Pedido({ usuario, nombreCliente, direccion, productos, total });
+    const { usuario, nombreCliente, telefono, direccion, productos, total } = req.body;
+    const nuevoPedido = new Pedido({ usuario, nombreCliente, telefono, direccion, productos, total });
     await nuevoPedido.save();
     res.status(201).json({ mensaje: "Pedido creado", pedido: nuevoPedido });
   } catch (err) {
@@ -163,6 +163,7 @@ const Usuario = mongoose.model("Usuario", usuarioSchema);
 const pedidoSchema = new mongoose.Schema({
   usuario: String,
   nombreCliente: String,
+  telefono: String,  // Campo agregado para el número telefónico
   direccion: String,
   productos: [{ nombre: String, precio: Number, cantidad: Number }],
   total: Number,
