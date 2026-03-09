@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Pagos | José María</title>
+<title>Pagos | Pastelería</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -62,11 +62,14 @@ button:hover{ background:#e6005c; }
     margin-bottom:15px;
     text-align:center;
 }
+.mensaje{
+    margin-top:15px;
+    text-align:center;
+    font-weight:bold;
+}
+.success { color:green; }
+.error { color:red; }
 </style>
-
-<!-- SDK PayPal: solo PayPal, deshabilita tarjetas -->
-<script src="https://www.paypal.com/sdk/js?client-id=sb&currency=USD&disable-funding=card"></script>
-
 </head>
 
 <body>
@@ -89,11 +92,13 @@ button:hover{ background:#e6005c; }
     <!-- Mensaje de gastos de envío -->
     <p class="mensaje-envio">⚠️ Nota: Los gastos de envío correrán por tu cuenta.</p>
 
-    <div id="paypal-button-container"></div>
+    <button onclick="confirmarPago()">Confirmar Pedido (Simular Pago)</button>
+
+    <div id="mensaje" class="mensaje"></div>
 </div>
 
 <script>
-const API = "http://localhost:5000";
+const API = "";  // Relativa: mismo dominio (funciona en local y Render)
 let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
 let usuario = JSON.parse(localStorage.getItem("usuario"));
 
@@ -102,10 +107,16 @@ if(!usuario){
     window.location.href = "login.html";
 }
 
+if(carrito.length === 0){
+    alert("Tu carrito está vacío.");
+    window.location.href = "carrito.html";
+}
+
 // Mostrar total
 function calcularTotal(){
-    let total = carrito.reduce((acc, item) => acc + (Number(item.precio)*item.cantidad),0);
+    let total = carrito.reduce((acc, item) => acc + (Number(item.precio) * item.cantidad), 0);
     document.getElementById("total").textContent = total.toFixed(2);
+    return total;
 }
 calcularTotal();
 
@@ -132,55 +143,56 @@ function usarUbicacion(){
     }
 }
 
-// ====== PayPal solo ======
-paypal.Buttons({
-    createOrder: function(data, actions){
-        let total = carrito.reduce((acc, item) => acc + (Number(item.precio)*item.cantidad),0);
-        return actions.order.create({
-            purchase_units: [{ amount: { value: total.toFixed(2) } }]
-        });
-    },
-    onApprove: function(data, actions){
-        return actions.order.capture().then(async function(details){
-            let nombre = document.getElementById("nombre").value.trim();
-            let direccion = document.getElementById("direccion").value.trim();
+// ====== Simular pago y guardar pedido ======
+async function confirmarPago(){
+    const nombre = document.getElementById("nombre").value.trim();
+    const direccion = document.getElementById("direccion").value.trim();
+    const mensajeDiv = document.getElementById("mensaje");
+    mensajeDiv.textContent = "";
+    mensajeDiv.className = "";
 
-            if(!nombre || !direccion){
-                alert("Por favor completa nombre y dirección.");
-                return;
-            }
-
-            let total = carrito.reduce((acc, item) => acc + (Number(item.precio)*item.cantidad),0);
-
-            try{
-                const response = await fetch(`${API}/api/pedidos`,{
-                    method:"POST",
-                    headers:{ "Content-Type":"application/json" },
-                    body: JSON.stringify({
-                        usuario: usuario.correo,
-                        nombreCliente: nombre,
-                        direccion: direccion,
-                        productos: carrito,
-                        total: total
-                    })
-                });
-
-                const data = await response.json();
-
-                if(response.ok){
-                    alert("✅ Pago realizado y pedido registrado 🎉");
-                    localStorage.removeItem("carrito");
-                    window.location.href = "mis-pedidos.html";
-                }else{
-                    alert(data.mensaje || "Error al registrar el pedido.");
-                }
-            }catch(err){
-                alert("Error de conexión con el servidor.");
-            }
-        });
+    if(!nombre || !direccion){
+        mensajeDiv.textContent = "Por favor completa nombre y dirección.";
+        mensajeDiv.className = "error";
+        return;
     }
-}).render('#paypal-button-container');
 
+    const total = calcularTotal();
+
+    const pedido = {
+        usuario: usuario.correo,
+        nombreCliente: nombre,
+        direccion: direccion,
+        productos: carrito,
+        total: total
+    };
+
+    try {
+        const res = await fetch(`${API}/api/pedidos`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(pedido)
+        });
+
+        const data = await res.json();
+
+        if(res.ok){
+            mensajeDiv.textContent = "¡Pedido registrado exitosamente! 🎉 Redirigiendo...";
+            mensajeDiv.className = "success";
+            localStorage.removeItem("carrito"); // Limpia carrito
+            setTimeout(() => {
+                window.location.href = "mis-pedidos.html";
+            }, 1500);
+        } else {
+            mensajeDiv.textContent = data.mensaje || "Error al registrar el pedido.";
+            mensajeDiv.className = "error";
+        }
+    } catch (err) {
+        mensajeDiv.textContent = "Error de conexión con el servidor: " + err.message;
+        mensajeDiv.className = "error";
+        console.error("Error en pago:", err);
+    }
+}
 </script>
 
 </body>
