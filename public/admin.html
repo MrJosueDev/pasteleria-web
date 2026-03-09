@@ -94,7 +94,7 @@ select{
 </div>
 
 <script>
-const API = "";  // Relativa: mismo dominio (funciona en local y producción)
+const API = "";  // Relativa: mismo dominio (funciona en local y Render)
 const usuario = JSON.parse(localStorage.getItem("usuario"));
 
 if(!usuario || usuario.role !== "admin"){
@@ -106,14 +106,17 @@ if(!usuario || usuario.role !== "admin"){
 // CARGAR PEDIDOS
 // ======================
 async function cargarPedidos(){
+    const container = document.getElementById("pedidosContainer");
+    container.innerHTML = "<p>Cargando pedidos...</p>";
+
     try{
         const res = await fetch(`${API}/api/pedidos`);
         if (!res.ok) {
-            throw new Error(`Status ${res.status}: ${await res.text()}`);
+            const errorText = await res.text();
+            throw new Error(`Status ${res.status}: ${errorText}`);
         }
         const pedidos = await res.json();
 
-        const container = document.getElementById("pedidosContainer");
         container.innerHTML = "";
 
         if(pedidos.length === 0){
@@ -159,8 +162,9 @@ async function cargarPedidos(){
         });
 
     }catch(error){
+        container.innerHTML = "";
         alert("Error cargando pedidos: " + error.message);
-        console.error("Fetch error:", error);
+        console.error("Fetch error en admin:", error);
     }
 }
 
@@ -174,12 +178,19 @@ async function cambiarEstado(id, nuevoEstado){
             headers:{ "Content-Type":"application/json" },
             body: JSON.stringify({ estado: nuevoEstado })
         });
+
         if (!res.ok) {
-            throw new Error(`Status ${res.status}`);
+            const errorText = await res.text();
+            throw new Error(`Status ${res.status}: ${errorText}`);
         }
+
+        // Recargar la lista para reflejar el cambio
         cargarPedidos();
+
+        alert("Estado actualizado correctamente ✅");
     }catch(err){
         alert("Error al cambiar estado: " + err.message);
+        console.error("Error cambiar estado:", err);
     }
 }
 
@@ -195,11 +206,18 @@ async function eliminarPedido(id){
         });
 
         if(!res.ok){
-            throw new Error(`Status ${res.status}`);
+            const errorText = await res.text();
+            throw new Error(`Status ${res.status}: ${errorText}`);
         }
 
+        // Quitar del DOM
         const tarjeta = document.getElementById(`pedido-${id}`);
         if(tarjeta) tarjeta.remove();
+
+        alert("Pedido eliminado correctamente ✅");
+
+        // Recargar la lista para sincronizar
+        cargarPedidos();
 
     }catch(err){
         alert("Error al eliminar el pedido: " + err.message);
