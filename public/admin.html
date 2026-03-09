@@ -143,7 +143,7 @@ async function cargarPedidos(){
             <div class="card" id="pedido-${pedido._id}">
                 <h3>Pedido de ${pedido.nombreCliente}</h3>
                 <p><strong>Correo:</strong> ${pedido.usuario}</p>
-                <p><strong>Teléfono:</strong> ${pedido.telefono || 'No proporcionado'}</p>
+                <p><strong>Teléfono:</strong> ${pedido.telefono || 'No proporcionado'}</p>  <!-- Línea agregada para mostrar teléfono -->
                 <p><strong>Dirección:</strong> ${pedido.direccion}</p>
                 <p><strong>Total:</strong> $${pedido.total}</p>
                 <p><strong>Estado:</strong> 
