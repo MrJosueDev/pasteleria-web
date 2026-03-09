@@ -102,6 +102,19 @@ app.put("/api/pedidos/:id", async (req, res) => {
   }
 });
 
+// DELETE para eliminar un pedido (desde admin.html)
+app.delete("/api/pedidos/:id", async (req, res) => {
+  console.log("DELETE /api/pedidos/:id recibido:", req.params.id);
+  try {
+    const pedido = await Pedido.findByIdAndDelete(req.params.id);
+    if (!pedido) return res.status(404).json({ mensaje: "Pedido no encontrado" });
+    res.json({ mensaje: "Pedido eliminado correctamente" });
+  } catch (err) {
+    console.error("Error /api/pedidos/:id DELETE:", err.message);
+    res.status(500).json({ mensaje: "Error al eliminar pedido" });
+  }
+});
+
 /* ========================
    📂 CONFIGURAR FRONTEND (después de API)
 ======================== */
