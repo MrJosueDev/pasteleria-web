@@ -5,15 +5,8 @@
 <title>Registro | Pastelería</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-body {
-    margin:0; font-family:Arial,sans-serif;
-    background:linear-gradient(135deg,#ff9eb5,#ffc1d6);
-    display:flex; justify-content:center; align-items:center; height:100vh;
-}
-.container {
-    background:white; padding:40px; border-radius:12px;
-    box-shadow:0 8px 20px rgba(0,0,0,0.2); width:350px;
-}
+body { margin:0; font-family:Arial,sans-serif; background:linear-gradient(135deg,#ff9eb5,#ffc1d6); display:flex; justify-content:center; align-items:center; height:100vh; }
+.container { background:white; padding:40px; border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,0.2); width:350px; }
 h2 { text-align:center; margin-bottom:25px; color:#ff4d88; }
 .input-group { margin-bottom:15px; }
 label { font-weight:bold; display:block; margin-bottom:5px; }
@@ -69,17 +62,24 @@ document.getElementById("registerForm").addEventListener("submit", async functio
             body: JSON.stringify({ nombre, correo, password })
         });
 
-        const data = await res.json();
+        let data;
+        try {
+            data = await res.json();
+        } catch (jsonErr) {
+            data = { mensaje: "Respuesta no es JSON: " + await res.text() };
+        }
 
-        // Siempre muestra el mensaje del servidor
-        mensajeDiv.textContent = data.mensaje || (res.ok ? "Registro exitoso ✅" : "Error desconocido ❌");
+        mensajeDiv.textContent = data.mensaje || (res.ok ? "Registro exitoso ✅" : `Error ${res.status}: ${res.statusText}`);
         mensajeDiv.className = res.ok ? "success" : "error";
+
+        console.log("Response status:", res.status);
+        console.log("Response data:", data);
 
         if (res.ok) {
             setTimeout(() => { window.location.href = "login.html"; }, 1500);
         }
     } catch (err) {
-        mensajeDiv.textContent = "Error de conexión real (network): " + err.message;
+        mensajeDiv.textContent = "Error de conexión real: " + err.message;
         mensajeDiv.className = "error";
         console.error("Fetch error:", err);
     }
