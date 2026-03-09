@@ -5,7 +5,7 @@
 <title>Mis Pedidos | José Maria</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-    body { margin:0; font-family: Arial, sans-serif; background:#fff8f5; }
+    body { margin:0; font-family: Arial, sans-serif; background:linear-gradient(135deg,#fff0f5,#ffe4ec); }
     header { background:#ff7aa2; padding:15px 30px; color:white; display:flex; justify-content:space-between; align-items:center; }
     header h1 { margin:0; font-family:Georgia, serif; font-weight:normal; }
     .container { padding:30px; max-width:900px; margin:auto; }
@@ -17,9 +17,7 @@
     .producto { margin-bottom:5px; }
     .estado { font-weight:bold; margin-top:10px; display:inline-block; padding:3px 8px; border-radius:5px; color:white; }
     .Pendiente { background:#f39c12; }
-    .procesando { background:#3498db; }
-    .completado { background:#2ecc71; }
-    .Enviado { background:#2ecc71; }
+    .Enviado { background:#3498db; }
     .Entregado { background:#27ae60; }
     .Cancelado { background:#e74c3c; }
     .sin-pedidos { text-align:center; margin-top:40px; font-size:18px; color:#666; }
@@ -39,6 +37,7 @@
         box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         z-index: 999;
     }
+    .error { color:red; text-align:center; font-weight:bold; margin-top:20px; }
 </style>
 </head>
 <body>
@@ -51,6 +50,7 @@
 <div class="container">
     <h2>Mis Pedidos</h2>
     <div id="listaPedidos"></div>
+    <div id="mensajeError" class="error"></div>
 </div>
 
 <button class="btn-flotante" onclick="nuevoPedido()">+</button>
@@ -58,7 +58,7 @@
 <div id="notif-estado"></div>
 
 <script>
-const API = "http://localhost:5000";
+const API = "";  // Relativa: mismo dominio (funciona en local y Render)
 const usuario = JSON.parse(localStorage.getItem("usuario"));
 
 if (!usuario) {
@@ -67,56 +67,64 @@ if (!usuario) {
 }
 
 const listaPedidos = document.getElementById("listaPedidos");
+const mensajeError = document.getElementById("mensajeError");
 
 document.addEventListener("DOMContentLoaded", cargarPedidos);
 
 async function cargarPedidos() {
+    mensajeError.textContent = "";
+    listaPedidos.innerHTML = "<p>Cargando pedidos...</p>";
+
     try {
-        const response = await fetch(`${API}/api/pedidos/${usuario.correo}`);
+        const response = await fetch(`${API}/api/pedidos/usuario/${usuario.correo}`);
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Status ${response.status}: ${errorText}`);
+        }
         const pedidos = await response.json();
-        renderPedidos(pedidos);
-    } catch (error) {
-        listaPedidos.innerHTML = "<p>Error al cargar pedidos.</p>";
-    }
-}
 
-function renderPedidos(pedidos) {
-    listaPedidos.innerHTML = "";
+        listaPedidos.innerHTML = "";
 
-    if (!pedidos.length) {
-        listaPedidos.innerHTML = `<div class="sin-pedidos">Aún no has realizado ningún pedido 🧁</div>`;
-        return;
-    }
+        if (!pedidos.length) {
+            listaPedidos.innerHTML = `<div class="sin-pedidos">Aún no has realizado ningún pedido 🧁</div>`;
+            return;
+        }
 
-    pedidos.forEach((pedido, index) => {
-        const pedidoDiv = document.createElement("div");
-        pedidoDiv.classList.add("pedido");
-        pedidoDiv.id = `pedido-${pedido._id}`;
+        pedidos.forEach((pedido, index) => {
+            const pedidoDiv = document.createElement("div");
+            pedidoDiv.classList.add("pedido");
+            pedidoDiv.id = `pedido-${pedido._id}`;
 
-        pedidoDiv.innerHTML = `
-            <h3>Pedido #${index + 1} - ${new Date(pedido.createdAt).toLocaleDateString()}</h3>
-            <div class="estado ${pedido.estado}">
-                ${pedido.estado}
-            </div>
-            <div class="productos">
-                ${pedido.productos.map(p => `
-                    <div class="producto">
-                        • ${p.nombre} x${p.cantidad} - $${p.precio}
-                    </div>
-                `).join("")}
-                <div><strong>Total: $${pedido.total}</strong></div>
-            </div>
-            <button class="deleteBtn" onclick="eliminarPedido('${pedido._id}')">Eliminar</button>
-        `;
+            let productosHTML = "";
+            pedido.productos.forEach(p => {
+                productosHTML += `<div class="producto">• ${p.nombre} x${p.cantidad} - $${p.precio}</div>`;
+            });
 
-        pedidoDiv.addEventListener("click", (e) => {
-            if(e.target.classList.contains("deleteBtn")) return;
-            const productosDiv = pedidoDiv.querySelector(".productos");
-            productosDiv.style.display = productosDiv.style.display === "block" ? "none" : "block";
+            pedidoDiv.innerHTML = `
+                <h3>Pedido #${index + 1} - ${new Date(pedido.createdAt).toLocaleDateString()}</h3>
+                <div class="estado ${pedido.estado}">
+                    ${pedido.estado}
+                </div>
+                <div class="productos">
+                    ${productosHTML}
+                    <div><strong>Total: $${pedido.total}</strong></div>
+                </div>
+                <button class="deleteBtn" onclick="eliminarPedido('${pedido._id}')">Eliminar</button>
+            `;
+
+            pedidoDiv.addEventListener("click", (e) => {
+                if(e.target.classList.contains("deleteBtn")) return;
+                const productosDiv = pedidoDiv.querySelector(".productos");
+                productosDiv.style.display = productosDiv.style.display === "block" ? "none" : "block";
+            });
+
+            listaPedidos.appendChild(pedidoDiv);
         });
-
-        listaPedidos.appendChild(pedidoDiv);
-    });
+    } catch (error) {
+        listaPedidos.innerHTML = "";
+        mensajeError.textContent = "Error al cargar pedidos: " + error.message;
+        console.error("Fetch error en mis-pedidos:", error);
+    }
 }
 
 async function eliminarPedido(id){
@@ -126,18 +134,25 @@ async function eliminarPedido(id){
         const res = await fetch(`${API}/api/pedidos/${id}`, {
             method: "DELETE"
         });
+
         if(!res.ok){
-            alert("Error al eliminar el pedido");
-            return;
+            const errorText = await res.text();
+            throw new Error(`Status ${res.status}: ${errorText}`);
         }
 
         // Quitar del DOM
         const tarjeta = document.getElementById(`pedido-${id}`);
         if(tarjeta) tarjeta.remove();
 
+        // Mostrar notificación
+        const notif = document.getElementById("notif-estado");
+        notif.textContent = "Pedido eliminado correctamente";
+        notif.style.display = "block";
+        setTimeout(() => { notif.style.display = "none"; }, 3000);
+
     } catch(err){
-        console.error(err);
-        alert("Error de conexión con el servidor");
+        alert("Error al eliminar: " + err.message);
+        console.error("Delete error:", err);
     }
 }
 
@@ -148,6 +163,9 @@ function volverInicio() {
 function nuevoPedido() {
     window.location.href = "index.html";
 }
+
+// Cargar al abrir
+cargarPedidos();
 </script>
 
 </body>
