@@ -88,6 +88,20 @@ app.get("/api/pedidos/usuario/:correo", async (req, res) => {
   }
 });
 
+// PUT para actualizar el estado de un pedido (desde admin.html)
+app.put("/api/pedidos/:id", async (req, res) => {
+  console.log("PUT /api/pedidos/:id recibido:", req.params.id, req.body);
+  try {
+    const { estado } = req.body;
+    const pedido = await Pedido.findByIdAndUpdate(req.params.id, { estado }, { new: true });
+    if (!pedido) return res.status(404).json({ mensaje: "Pedido no encontrado" });
+    res.json({ mensaje: "Estado actualizado", pedido });
+  } catch (err) {
+    console.error("Error /api/pedidos/:id:", err.message);
+    res.status(500).json({ mensaje: "Error al actualizar estado" });
+  }
+});
+
 /* ========================
    📂 CONFIGURAR FRONTEND (después de API)
 ======================== */
