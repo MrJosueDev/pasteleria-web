@@ -50,7 +50,7 @@ app.post("/api/login", async (req, res) => {
   }
 });
 
-// RUTA PARA CREAR PEDIDO (desde pagos.html)
+// POST para crear pedido (desde pagos.html)
 app.post("/api/pedidos", async (req, res) => {
   console.log("POST /api/pedidos recibido:", req.body);
   try {
@@ -64,15 +64,27 @@ app.post("/api/pedidos", async (req, res) => {
   }
 });
 
-// RUTA PARA LISTAR TODOS LOS PEDIDOS (para admin.html)
+// GET para listar TODOS los pedidos (para admin.html)
 app.get("/api/pedidos", async (req, res) => {
-  console.log("GET /api/pedidos recibido - cargando pedidos para admin");
+  console.log("GET /api/pedidos recibido - cargando todos los pedidos para admin");
   try {
     const pedidos = await Pedido.find().sort({ createdAt: -1 });
     res.json(pedidos);
   } catch (err) {
     console.error("Error /api/pedidos GET:", err.message);
     res.status(500).json({ mensaje: "Error al obtener pedidos" });
+  }
+});
+
+// GET para pedidos del usuario actual (para mis-pedidos.html)
+app.get("/api/pedidos/usuario/:correo", async (req, res) => {
+  console.log("GET /api/pedidos/usuario recibido:", req.params.correo);
+  try {
+    const pedidos = await Pedido.find({ usuario: req.params.correo }).sort({ createdAt: -1 });
+    res.json(pedidos);
+  } catch (err) {
+    console.error("Error /api/pedidos/usuario:", err.message);
+    res.status(500).json({ mensaje: "Error al obtener pedidos del usuario" });
   }
 });
 
