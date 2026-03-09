@@ -50,7 +50,19 @@ app.post("/api/login", async (req, res) => {
   }
 });
 
-// Agrega aquí tus rutas de pedidos si las tienes (post, get, put, delete /api/pedidos...)
+// NUEVA RUTA: GET para listar todos los pedidos (para admin.html)
+app.get("/api/pedidos", async (req, res) => {
+  console.log("GET /api/pedidos recibido - cargando pedidos para admin");
+  try {
+    const pedidos = await Pedido.find().sort({ createdAt: -1 });
+    res.json(pedidos);
+  } catch (err) {
+    console.error("Error en GET /api/pedidos:", err.message);
+    res.status(500).json({ mensaje: "Error al obtener pedidos" });
+  }
+});
+
+// Agrega aquí otras rutas de pedidos (POST, PUT, DELETE) si las tenés
 
 /* ========================
    📂 CONFIGURAR FRONTEND (después de API)
@@ -79,9 +91,9 @@ app.use((req, res) => {
 });
 
 /* ========================
-   🗄 CONEXIÓN MONGODB (sin opciones depreciadas)
+   🗄 CONEXIÓN MONGODB
 ======================== */
-const mongoURI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/pasteleria";
+const mongoURI = process.env.MONGO_URI;
 mongoose.connect(mongoURI)
   .then(() => console.log("✅ MongoDB conectado"))
   .catch(err => console.error("❌ Error MongoDB:", err.message));
