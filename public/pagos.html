@@ -80,14 +80,14 @@ button:hover{ background:#e6005c; }
         Total a pagar: $<span id="total">0.00</span>
     </div>
 
-    <input type="text" id="nombre" placeholder="Nombre completo" required>
-    <input type="tel" id="telefono" placeholder="Número telefónico" required pattern="[0-9]{8}" title="Ingresa un número de 8 dígitos">
-    <input type="text" id="direccion" placeholder="Dirección de entrega" required>
+    <input type="text" id="nombre" placeholder="Nombre completo / Full name" required>
+    <input type="tel" id="telefono" placeholder="Número telefónico / Phone number (ej: +1 555-123-4567)" required>
+    <input type="text" id="direccion" placeholder="Dirección de entrega / Delivery address" required>
 
     <!-- Mensaje de gastos de envío -->
-    <p class="mensaje-envio">⚠️ Nota: Los gastos de envío correrán por tu cuenta.</p>
+    <p class="mensaje-envio">⚠️ Nota: Los gastos de envío correrán por tu cuenta / Shipping fees apply.</p>
 
-    <button onclick="confirmarPago()">Confirmar Pedido (Simular Pago)</button>
+    <button onclick="confirmarPago()">Confirmar Pedido (Simular Pago) / Confirm Order (Simulate Payment)</button>
 
     <div id="mensaje" class="mensaje"></div>
 </div>
@@ -98,12 +98,12 @@ let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
 let usuario = JSON.parse(localStorage.getItem("usuario"));
 
 if(!usuario){
-    alert("Debes iniciar sesión para continuar.");
+    alert("Debes iniciar sesión para continuar / You must log in to continue.");
     window.location.href = "login.html";
 }
 
 if(carrito.length === 0){
-    alert("Tu carrito está vacío.");
+    alert("Tu carrito está vacío / Your cart is empty.");
     window.location.href = "carrito.html";
 }
 
@@ -125,14 +125,14 @@ async function confirmarPago(){
     mensajeDiv.className = "";
 
     if(!nombre || !telefono || !direccion){
-        mensajeDiv.textContent = "Por favor completa nombre, teléfono y dirección.";
+        mensajeDiv.textContent = "Por favor completa nombre, teléfono y dirección / Please complete name, phone and address.";
         mensajeDiv.className = "error";
         return;
     }
 
-    // Validación simple de teléfono (8 dígitos, El Salvador)
-    if (!/^\d{8}$/.test(telefono)) {
-        mensajeDiv.textContent = "El teléfono debe tener 8 dígitos.";
+    // Validación flexible de teléfono (8-15 dígitos, con o sin +)
+    if (!/^\+?\d{8,15}$/.test(telefono.replace(/[\-\s]/g, ''))) {
+        mensajeDiv.textContent = "El teléfono debe tener entre 8 y 15 dígitos / Phone number must be 8-15 digits.";
         mensajeDiv.className = "error";
         return;
     }
@@ -142,7 +142,7 @@ async function confirmarPago(){
     const pedido = {
         usuario: usuario.correo,
         nombreCliente: nombre,
-        telefono: telefono,  // Se envía a la DB
+        telefono: telefono,
         direccion: direccion,
         productos: carrito,
         total: total
@@ -158,18 +158,18 @@ async function confirmarPago(){
         const data = await res.json();
 
         if(res.ok){
-            mensajeDiv.textContent = "¡Pedido registrado exitosamente! 🎉 Redirigiendo...";
+            mensajeDiv.textContent = "¡Pedido registrado exitosamente! 🎉 Redirigiendo... / Order registered successfully! Redirecting...";
             mensajeDiv.className = "success";
             localStorage.removeItem("carrito"); // Limpia carrito
             setTimeout(() => {
                 window.location.href = "mis-pedidos.html";
             }, 1500);
         } else {
-            mensajeDiv.textContent = data.mensaje || "Error al registrar el pedido.";
+            mensajeDiv.textContent = data.mensaje || "Error al registrar el pedido / Error registering order.";
             mensajeDiv.className = "error";
         }
     } catch (err) {
-        mensajeDiv.textContent = "Error de conexión con el servidor: " + err.message;
+        mensajeDiv.textContent = "Error de conexión con el servidor / Server connection error: " + err.message;
         mensajeDiv.className = "error";
         console.error("Error en pago:", err);
     }
