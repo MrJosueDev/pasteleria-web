@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <title>Panel Admin - Pastelería</title>
 
-<!-- OneSignal Push Integration (si ya lo agregaste, déjalo; si no, pégalo aquí antes de </head>) -->
+<!-- OneSignal Push Integration -->
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <script>
   window.OneSignalDeferred = window.OneSignalDeferred || [];
@@ -16,6 +16,9 @@
         enable: true,
       },
     });
+
+    // Fuerza el prompt de permiso al cargar la página
+    OneSignal.showSlidedownPrompt();
   });
 </script>
 
@@ -213,7 +216,7 @@ async function cargarPedidos(){
 }
 
 // ======================
-// CHEQUEO DE NUEVOS PEDIDOS (cada 30 segundos) + notificación
+// CHEQUEO DE NUEVOS PEDIDOS (cada 30 segundos) + notificación push
 setInterval(async () => {
   try {
     const res = await fetch(`${API}/api/pedidos`);
