@@ -4,6 +4,21 @@
 <meta charset="UTF-8">
 <title>Panel Admin - Pastelería</title>
 
+<!-- OneSignal Push Integration (si ya lo agregaste, déjalo; si no, pégalo aquí antes de </head>) -->
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(async function(OneSignal) {
+    await OneSignal.init({
+      appId: "6340c3d5-c21f-4f72-9bd1-498510575ddf",
+      safari_web_id: "web.onesignal.auto.39e347a3-7290-467c-af89-3542a6fc2365",
+      notifyButton: {
+        enable: true,
+      },
+    });
+  });
+</script>
+
 <style>
 body{
     margin:0;
@@ -79,6 +94,26 @@ select{
 .ubicacionBtn:hover{
     opacity:0.9;
 }
+
+/* Notificación flotante para nuevos pedidos */
+#notif-nuevo-pedido {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #ff4d88;
+    color: white;
+    padding: 15px 25px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    z-index: 1000;
+    display: none;
+    animation: slideIn 0.5s forwards;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
 </style>
 </head>
 <body>
@@ -93,6 +128,9 @@ select{
     <div id="pedidosContainer"></div>
 </div>
 
+<!-- Notificación flotante -->
+<div id="notif-nuevo-pedido"></div>
+
 <script>
 const API = "";  // Relativa: mismo dominio (funciona en local y Render)
 const usuario = JSON.parse(localStorage.getItem("usuario"));
@@ -101,6 +139,8 @@ if(!usuario || usuario.role !== "admin"){
     alert("Acceso solo para administradores");
     window.location.href = "login.html";
 }
+
+let pedidosAnteriores = 0;  // Para detectar nuevos pedidos
 
 // ======================
 // CARGAR PEDIDOS
@@ -121,6 +161,7 @@ async function cargarPedidos(){
 
         if(pedidos.length === 0){
             container.innerHTML = "<p>No hay pedidos aún.</p>";
+            pedidosAnteriores = 0;
             return;
         }
 
@@ -143,7 +184,7 @@ async function cargarPedidos(){
             <div class="card" id="pedido-${pedido._id}">
                 <h3>Pedido de ${pedido.nombreCliente}</h3>
                 <p><strong>Correo:</strong> ${pedido.usuario}</p>
-                <p><strong>Teléfono:</strong> ${pedido.telefono || 'No proporcionado'}</p>  <!-- Línea agregada para mostrar teléfono -->
+                <p><strong>Teléfono:</strong> ${pedido.telefono || 'No proporcionado'}</p>
                 <p><strong>Dirección:</strong> ${pedido.direccion}</p>
                 <p><strong>Total:</strong> $${pedido.total}</p>
                 <p><strong>Estado:</strong> 
@@ -161,12 +202,43 @@ async function cargarPedidos(){
             `;
         });
 
+        // Actualiza la cantidad anterior para el polling
+        pedidosAnteriores = pedidos.length;
+
     }catch(error){
         container.innerHTML = "";
         alert("Error cargando pedidos: " + error.message);
         console.error("Fetch error en admin:", error);
     }
 }
+
+// ======================
+// CHEQUEO DE NUEVOS PEDIDOS (cada 30 segundos) + notificación
+setInterval(async () => {
+  try {
+    const res = await fetch(`${API}/api/pedidos`);
+    if (!res.ok) return;
+    const pedidos = await res.json();
+
+    if (pedidos.length > pedidosAnteriores) {
+      const nuevos = pedidos.length - pedidosAnteriores;
+      const notif = document.getElementById("notif-nuevo-pedido");
+      notif.innerHTML = `¡${nuevos} nuevo(s) pedido(s)! 🔔`;
+      notif.style.display = "block";
+      setTimeout(() => { notif.style.display = "none"; }, 5000);  // Desaparece en 5 seg
+
+      // Sonido opcional (descomenta si querés)
+      // new Audio('https://assets.mixkit.co/sfx/preview/mixkit-bell-notification-1007.mp3').play();
+
+      // Recarga la lista automáticamente
+      cargarPedidos();
+    }
+
+    pedidosAnteriores = pedidos.length;
+  } catch (err) {
+    console.error("Error en polling de nuevos pedidos:", err);
+  }
+}, 30000);  // 30 segundos
 
 // ======================
 // CAMBIAR ESTADO
@@ -184,9 +256,7 @@ async function cambiarEstado(id, nuevoEstado){
             throw new Error(`Status ${res.status}: ${errorText}`);
         }
 
-        // Recargar la lista para reflejar el cambio
         cargarPedidos();
-
         alert("Estado actualizado correctamente ✅");
     }catch(err){
         alert("Error al cambiar estado: " + err.message);
@@ -210,13 +280,10 @@ async function eliminarPedido(id){
             throw new Error(`Status ${res.status}: ${errorText}`);
         }
 
-        // Quitar del DOM
         const tarjeta = document.getElementById(`pedido-${id}`);
         if(tarjeta) tarjeta.remove();
 
         alert("Pedido eliminado correctamente ✅");
-
-        // Recargar la lista para sincronizar
         cargarPedidos();
 
     }catch(err){
