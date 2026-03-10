@@ -163,7 +163,7 @@ const Usuario = mongoose.model("Usuario", usuarioSchema);
 const pedidoSchema = new mongoose.Schema({
   usuario: String,
   nombreCliente: String,
-  telefono: String,  // Campo agregado para el número telefónico
+  telefono: String,  // Campo para el número telefónico
   direccion: String,
   productos: [{ nombre: String, precio: Number, cantidad: Number }],
   total: Number,
