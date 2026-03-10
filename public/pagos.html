@@ -81,7 +81,7 @@ button:hover{ background:#e6005c; }
     </div>
 
     <input type="text" id="nombre" placeholder="Nombre completo" required>
-    <input type="tel" id="telefono" placeholder="Número telefónico" required>
+    <input type="tel" id="telefono" placeholder="Número telefónico" required pattern="[0-9]{8}" title="Ingresa un número de 8 dígitos">
     <input type="text" id="direccion" placeholder="Dirección de entrega" required>
 
     <!-- Mensaje de gastos de envío -->
@@ -130,12 +130,19 @@ async function confirmarPago(){
         return;
     }
 
+    // Validación simple de teléfono (8 dígitos, El Salvador)
+    if (!/^\d{8}$/.test(telefono)) {
+        mensajeDiv.textContent = "El teléfono debe tener 8 dígitos.";
+        mensajeDiv.className = "error";
+        return;
+    }
+
     const total = calcularTotal();
 
     const pedido = {
         usuario: usuario.correo,
         nombreCliente: nombre,
-        telefono: telefono,  // Nuevo campo
+        telefono: telefono,  // Se envía a la DB
         direccion: direccion,
         productos: carrito,
         total: total
