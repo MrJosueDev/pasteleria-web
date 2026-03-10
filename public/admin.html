@@ -216,7 +216,7 @@ async function cargarPedidos(){
 }
 
 // ======================
-// CHEQUEO DE NUEVOS PEDIDOS (cada 30 segundos) + notificación push
+// CHEQUEO DE NUEVOS PEDIDOS (cada 30 segundos) + notificación flotante
 setInterval(async () => {
   try {
     const res = await fetch(`${API}/api/pedidos`);
@@ -230,7 +230,7 @@ setInterval(async () => {
       notif.style.display = "block";
       setTimeout(() => { notif.style.display = "none"; }, 5000);  // Desaparece en 5 seg
 
-      // Sonido opcional (descomenta si querés)
+      // Sonido opcional (descomenta si querés que suene al llegar pedido nuevo)
       // new Audio('https://assets.mixkit.co/sfx/preview/mixkit-bell-notification-1007.mp3').play();
 
       // Recarga la lista automáticamente
