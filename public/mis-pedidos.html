@@ -150,6 +150,9 @@ async function eliminarPedido(id){
         notif.style.display = "block";
         setTimeout(() => { notif.style.display = "none"; }, 3000);
 
+        // Recargar la lista
+        cargarPedidos();
+
     } catch(err){
         alert("Error al eliminar: " + err.message);
         console.error("Delete error:", err);
