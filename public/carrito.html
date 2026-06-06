@@ -1,129 +1,468 @@
+
+raw
+Carrito · HTML
 <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Carrito | José María</title>
+<title>Carrito | María José Repostería</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-*{ box-sizing:border-box; }
-body { margin:0; font-family: Arial, sans-serif; background: linear-gradient(135deg,#fff0f5,#ffe4ec); }
-header { background: linear-gradient(90deg,#ff4d88,#ff7aa2); padding: 15px 40px; color: white; }
-h1 { margin: 0; font-family: Georgia, serif; font-weight: normal; }
-.carrito-container { max-width: 900px; margin: 40px auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
-h2 { color: #ff4d88; margin-bottom: 20px; }
-.item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding: 15px 0; }
-.item-info { display: flex; align-items: center; gap: 15px; }
-.item-info img { width: 60px; height: 60px; object-fit: cover; border-radius: 12px; }
-.item-info p{ margin:5px 0 0 0; color:#777; }
-.item-controls { display: flex; align-items: center; gap: 10px; }
-.cantidad-btn, .eliminar-btn { border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; transition:0.3s; }
-.cantidad-btn { background: #ff4d88; color: white; }
-.cantidad-btn:hover{ background:#e6005c; }
-.eliminar-btn { background: #b30059; color: white; }
-.eliminar-btn:hover{ background:#800040; }
-.total { text-align: right; font-size: 22px; font-weight: bold; margin-top: 25px; color: #ff4d88; }
-.acciones { display: flex; justify-content: space-between; margin-top: 30px; }
-.btn { padding: 12px 22px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition:0.3s; }
-.volver-btn { background: #ffc1d6; color: #b30059; }
-.volver-btn:hover{ background:#ff9fbe; }
-.pagar-btn { background: #ff4d88; color: white; }
-.pagar-btn:hover{ background:#e6005c; }
-.carrito-vacio { text-align: center; padding: 40px; color: #777; }
-@media(max-width:700px){
-    .item{ flex-direction:column; align-items:flex-start; gap:10px; }
-    .acciones{ flex-direction:column; gap:15px; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+:root {
+  --rose:       #c9697a;
+  --rose-light: #e8a0aa;
+  --rose-pale:  #f5dde0;
+  --cream:      #fdf8f3;
+  --brown:      #6b4c3b;
+  --brown-mid:  #9a7060;
+  --brown-pale: #e8dbd6;
+  --text:       #3a2a26;
+  --text-mid:   #7a5c54;
+  --text-light: #b89a94;
+  --white:      #ffffff;
+}
+ 
+body {
+  font-family: 'Jost', sans-serif;
+  background: var(--cream);
+  color: var(--text);
+  min-height: 100vh;
+}
+ 
+/* ── HEADER ── */
+header {
+  background: var(--white);
+  border-bottom: 1px solid var(--brown-pale);
+  padding: 0 6%;
+  height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 2px 16px rgba(107,76,59,0.06);
+}
+.header-brand {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--brown);
+  text-decoration: none;
+}
+.header-brand span { color: var(--rose); font-style: italic; }
+ 
+.header-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-light);
+  text-decoration: none;
+  transition: color 0.25s;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: 'Jost', sans-serif;
+}
+.header-back::before { content: '←'; font-size: 0.9rem; }
+.header-back:hover { color: var(--rose); }
+ 
+/* ── LAYOUT ── */
+.page {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 52px 24px 80px;
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 32px;
+  align-items: start;
+}
+ 
+/* ── TÍTULO ── */
+.page-header { grid-column: 1 / -1; margin-bottom: 8px; }
+.page-eyebrow {
+  font-size: 0.68rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--rose);
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+.page-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--brown);
+  line-height: 1.15;
+}
+.page-title em { font-style: italic; color: var(--rose); }
+ 
+/* ── LISTA CARRITO ── */
+.carrito-lista {
+  background: var(--white);
+  border: 1px solid var(--brown-pale);
+  border-radius: 4px;
+  overflow: hidden;
+}
+ 
+.carrito-vacio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 72px 24px;
+  text-align: center;
+  gap: 16px;
+}
+.carrito-vacio-icon {
+  font-size: 3rem;
+  opacity: 0.3;
+}
+.carrito-vacio p {
+  font-size: 1rem;
+  color: var(--text-light);
+  font-weight: 300;
+}
+.carrito-vacio a {
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--rose);
+  text-decoration: none;
+  border-bottom: 1px solid var(--rose-pale);
+  padding-bottom: 2px;
+  font-weight: 500;
+  transition: border-color 0.25s;
+}
+.carrito-vacio a:hover { border-color: var(--rose); }
+ 
+/* ── ITEM ── */
+.item {
+  display: grid;
+  grid-template-columns: 64px 1fr auto;
+  gap: 16px;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--brown-pale);
+  transition: background 0.2s;
+}
+.item:last-child { border-bottom: none; }
+.item:hover { background: var(--cream); }
+ 
+.item-img {
+  width: 64px; height: 64px;
+  object-fit: cover;
+  border-radius: 3px;
+  border: 1px solid var(--brown-pale);
+}
+ 
+.item-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--brown);
+  margin-bottom: 3px;
+}
+.item-opcion {
+  font-size: 0.78rem;
+  color: var(--rose);
+  font-weight: 400;
+  margin-bottom: 4px;
+}
+.item-precio {
+  font-size: 0.82rem;
+  color: var(--text-light);
+  font-weight: 300;
+}
+ 
+.item-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+ 
+.qty-wrap {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--brown-pale);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.qty-btn {
+  width: 30px; height: 30px;
+  border: none;
+  background: var(--cream);
+  color: var(--brown);
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Jost', sans-serif;
+}
+.qty-btn:hover { background: var(--rose); color: var(--white); }
+.qty-num {
+  width: 32px;
+  text-align: center;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--text);
+  border-left: 1px solid var(--brown-pale);
+  border-right: 1px solid var(--brown-pale);
+  user-select: none;
+}
+ 
+.item-subtotal {
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--rose);
+  min-width: 60px;
+  text-align: right;
+}
+ 
+.btn-eliminar {
+  background: none;
+  border: none;
+  color: var(--text-light);
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 4px;
+  transition: color 0.25s;
+  line-height: 1;
+}
+.btn-eliminar:hover { color: var(--rose); }
+ 
+/* ── RESUMEN ── */
+.resumen {
+  background: var(--white);
+  border: 1px solid var(--brown-pale);
+  border-radius: 4px;
+  overflow: hidden;
+  position: sticky;
+  top: 88px;
+}
+.resumen-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--brown-pale);
+}
+.resumen-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--brown);
+}
+.resumen-body { padding: 20px 24px; }
+ 
+.resumen-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.88rem;
+  color: var(--text-mid);
+  margin-bottom: 12px;
+}
+.resumen-row.total {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--brown);
+  border-top: 1px solid var(--brown-pale);
+  padding-top: 16px;
+  margin-top: 4px;
+  margin-bottom: 0;
+}
+.resumen-row.total span:last-child { color: var(--rose); }
+ 
+.resumen-actions { padding: 0 24px 24px; display: flex; flex-direction: column; gap: 10px; }
+ 
+.btn-pagar {
+  width: 100%;
+  padding: 14px;
+  background: var(--rose);
+  color: var(--white);
+  font-family: 'Jost', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background 0.25s, transform 0.2s;
+}
+.btn-pagar:hover { background: var(--rose-light); transform: translateY(-1px); }
+.btn-pagar:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+ 
+.btn-seguir {
+  width: 100%;
+  padding: 12px;
+  background: transparent;
+  color: var(--brown-mid);
+  font-family: 'Jost', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1px solid var(--brown-pale);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: border-color 0.25s, color 0.25s;
+}
+.btn-seguir:hover { border-color: var(--brown-mid); color: var(--brown); }
+ 
+.resumen-nota {
+  font-size: 0.74rem;
+  color: var(--text-light);
+  text-align: center;
+  padding: 0 24px 20px;
+  line-height: 1.5;
+}
+ 
+/* ── RESPONSIVE ── */
+@media (max-width: 720px) {
+  .page { grid-template-columns: 1fr; padding: 32px 16px 60px; }
+  .resumen { position: static; }
+  .item { grid-template-columns: 56px 1fr; gap: 12px; }
+  .item-controls { grid-column: 1 / -1; justify-content: space-between; }
 }
 </style>
 </head>
 <body>
-
+ 
+<!-- ── HEADER ── -->
 <header>
-    <h1>Carrito de Compras 🛒</h1>
+  <a href="index.html" class="header-brand">María <span>José</span></a>
+  <button class="header-back" onclick="window.location.href='index.html'">Seguir comprando</button>
 </header>
-
-<div class="carrito-container">
-    <h2>Productos en tu carrito</h2>
-    <div id="listaCarrito"></div>
-    <div class="total">Total: $<span id="total">0.00</span></div>
-    <div class="acciones">
-        <button class="btn volver-btn" onclick="volverInicio()">← Seguir Comprando</button>
-        <button class="btn pagar-btn" onclick="procederPago()">Proceder al Pago 💳</button>
+ 
+<!-- ── CONTENIDO ── -->
+<div class="page">
+ 
+  <div class="page-header">
+    <div class="page-eyebrow">Tu selección</div>
+    <h1 class="page-title">Carrito de <em>compras</em></h1>
+  </div>
+ 
+  <!-- Lista -->
+  <div class="carrito-lista" id="listaCarrito"></div>
+ 
+  <!-- Resumen -->
+  <aside class="resumen">
+    <div class="resumen-header">
+      <div class="resumen-title">Resumen del pedido</div>
     </div>
+    <div class="resumen-body">
+      <div class="resumen-row">
+        <span>Subtotal (<span id="cantItems">0</span> productos)</span>
+        <span>$<span id="subtotal">0.00</span></span>
+      </div>
+      <div class="resumen-row">
+        <span>Envío</span>
+        <span style="color:var(--brown-mid)">A coordinar</span>
+      </div>
+      <div class="resumen-row total">
+        <span>Total</span>
+        <span>$<span id="total">0.00</span></span>
+      </div>
+    </div>
+    <div class="resumen-actions">
+      <button class="btn-pagar" id="btnPagar" onclick="procederPago()">Proceder al pago</button>
+      <button class="btn-seguir" onclick="window.location.href='index.html'">← Seguir comprando</button>
+    </div>
+    <p class="resumen-nota">🔒 Pago seguro · Tus datos están protegidos</p>
+  </aside>
+ 
 </div>
-
+ 
 <script>
 document.addEventListener("DOMContentLoaded", cargarCarrito);
-
+ 
 function cargarCarrito() {
-    const lista = document.getElementById("listaCarrito");
-    let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
-    lista.innerHTML = "";
-
-    if (carrito.length === 0) {
-        lista.innerHTML = '<div class="carrito-vacio">Tu carrito está vacío 🛍️</div>';
-        document.getElementById("total").textContent = "0.00";
-        return;
-    }
-
-    carrito.forEach((producto, index) => {
-        const item = document.createElement("div");
-        item.classList.add("item");
-
-        // Usamos directamente la imagen guardada en localStorage
-        const imgSrc = producto.imagen || "imagenes/logo.jpeg"; // fallback por si no tiene imagen
-        let nombreMostrado = producto.nombre;
-        if(producto.opcion) nombreMostrado += " - " + producto.opcion;
-
-        item.innerHTML = `
-            <div class="item-info">
-                <img src="${imgSrc}" alt="${nombreMostrado}">
-                <div>
-                    <strong>${nombreMostrado}</strong>
-                    <p>Precio: $${Number(producto.precio).toFixed(2)}</p>
-                </div>
-            </div>
-            <div class="item-controls">
-                <button class="cantidad-btn" onclick="cambiarCantidad(${index}, -1)">-</button>
-                <span>${producto.cantidad}</span>
-                <button class="cantidad-btn" onclick="cambiarCantidad(${index}, 1)">+</button>
-                <button class="eliminar-btn" onclick="eliminarItem(${index})">Eliminar</button>
-            </div>
-        `;
-        lista.appendChild(item);
-    });
-
-    actualizarTotal();
+  const lista = document.getElementById("listaCarrito");
+  let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+  lista.innerHTML = "";
+ 
+  if (carrito.length === 0) {
+    lista.innerHTML = `
+      <div class="carrito-vacio">
+        <div class="carrito-vacio-icon">🛍️</div>
+        <p>Tu carrito está vacío por ahora.</p>
+        <a href="index.html">Explorar productos</a>
+      </div>`;
+    document.getElementById("btnPagar").disabled = true;
+    actualizarResumen(carrito);
+    return;
+  }
+ 
+  document.getElementById("btnPagar").disabled = false;
+ 
+  carrito.forEach((producto, index) => {
+    const imgSrc = producto.imagen || "imagenes/logo.jpeg";
+    const nombreMostrado = producto.nombre;
+    const opcionHTML = producto.opcion
+      ? `<div class="item-opcion">${producto.opcion}</div>` : '';
+    const subtotal = (Number(producto.precio) * producto.cantidad).toFixed(2);
+ 
+    const item = document.createElement("div");
+    item.classList.add("item");
+    item.innerHTML = `
+      <img class="item-img" src="${imgSrc}" alt="${nombreMostrado}"
+        onerror="this.src='https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=120&q=60'">
+      <div>
+        <div class="item-name">${nombreMostrado}</div>
+        ${opcionHTML}
+        <div class="item-precio">$${Number(producto.precio).toFixed(2)} c/u</div>
+      </div>
+      <div class="item-controls">
+        <div class="qty-wrap">
+          <button class="qty-btn" onclick="cambiarCantidad(${index}, -1)">−</button>
+          <div class="qty-num">${producto.cantidad}</div>
+          <button class="qty-btn" onclick="cambiarCantidad(${index}, 1)">+</button>
+        </div>
+        <div class="item-subtotal">$${subtotal}</div>
+        <button class="btn-eliminar" onclick="eliminarItem(${index})" title="Eliminar">✕</button>
+      </div>
+    `;
+    lista.appendChild(item);
+  });
+ 
+  actualizarResumen(carrito);
 }
-
+ 
+function actualizarResumen(carrito) {
+  const total = carrito.reduce((acc, i) => acc + Number(i.precio) * i.cantidad, 0);
+  const cant  = carrito.reduce((acc, i) => acc + i.cantidad, 0);
+  document.getElementById("total").textContent    = total.toFixed(2);
+  document.getElementById("subtotal").textContent = total.toFixed(2);
+  document.getElementById("cantItems").textContent = cant;
+}
+ 
 function cambiarCantidad(index, cambio) {
-    let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
-    carrito[index].cantidad += cambio;
-    if (carrito[index].cantidad <= 0) carrito.splice(index, 1);
-    localStorage.setItem("carrito", JSON.stringify(carrito));
-    cargarCarrito();
+  let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+  carrito[index].cantidad += cambio;
+  if (carrito[index].cantidad <= 0) carrito.splice(index, 1);
+  localStorage.setItem("carrito", JSON.stringify(carrito));
+  cargarCarrito();
 }
-
+ 
 function eliminarItem(index) {
-    let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
-    carrito.splice(index, 1);
-    localStorage.setItem("carrito", JSON.stringify(carrito));
-    cargarCarrito();
+  let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+  carrito.splice(index, 1);
+  localStorage.setItem("carrito", JSON.stringify(carrito));
+  cargarCarrito();
 }
-
-function actualizarTotal() {
-    let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
-    let total = carrito.reduce((acc, item) => acc + (Number(item.precio) * item.cantidad), 0);
-    document.getElementById("total").textContent = total.toFixed(2);
-}
-
-function volverInicio() { window.location.href = "index.html"; }
-
+ 
 function procederPago() {
-    let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
-    if (carrito.length === 0) { alert("Tu carrito está vacío 🛍️"); return; }
-    window.location.href = "./pagos.html";
+  let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+  if (carrito.length === 0) return;
+  window.location.href = "pagos.html";
 }
 </script>
-
+ 
 </body>
 </html>
