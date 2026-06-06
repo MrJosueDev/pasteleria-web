@@ -2,179 +2,493 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Pagos | Pastelería</title>
+<title>Finalizar Pedido | María José Repostería</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-body{
-    margin:0;
-    font-family:Arial, sans-serif;
-    background:linear-gradient(135deg,#fff0f5,#ffe4ec);
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+:root {
+  --rose:       #c9697a;
+  --rose-light: #e8a0aa;
+  --rose-pale:  #f5dde0;
+  --cream:      #fdf8f3;
+  --brown:      #6b4c3b;
+  --brown-mid:  #9a7060;
+  --brown-pale: #e8dbd6;
+  --text:       #3a2a26;
+  --text-mid:   #7a5c54;
+  --text-light: #b89a94;
+  --white:      #ffffff;
 }
-header{
-    background:linear-gradient(90deg,#ff4d88,#ff7aa2);
-    padding:15px 40px;
-    color:white;
+ 
+body {
+  font-family: 'Jost', sans-serif;
+  background: var(--cream);
+  color: var(--text);
+  min-height: 100vh;
 }
-h1{ margin:0; font-family:Georgia, serif; font-weight:normal; }
-.pago-container{
-    max-width:600px;
-    margin:40px auto;
-    background:white;
-    padding:30px;
-    border-radius:15px;
-    box-shadow:0 10px 25px rgba(0,0,0,0.15);
+ 
+/* ── HEADER ── */
+header {
+  background: var(--white);
+  border-bottom: 1px solid var(--brown-pale);
+  padding: 0 6%;
+  height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 2px 16px rgba(107,76,59,0.06);
 }
-h2{ color:#ff4d88; margin-bottom:20px; }
-input{
-    width:100%;
-    padding:10px;
-    margin-bottom:15px;
-    border-radius:8px;
-    border:1px solid #ccc;
+.header-brand {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--brown);
+  text-decoration: none;
 }
-button{
-    width:100%;
-    padding:12px;
-    border:none;
-    border-radius:8px;
-    background:#ff4d88;
-    color:white;
-    font-weight:bold;
-    cursor:pointer;
-    transition:0.3s;
+.header-brand span { color: var(--rose); font-style: italic; }
+.header-back {
+  font-family: 'Jost', sans-serif;
+  font-size: 0.76rem;
+  font-weight: 500;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--text-light);
+  background: none;
+  border: 1px solid var(--brown-pale);
+  border-radius: 2px;
+  padding: 8px 18px;
+  cursor: pointer;
+  transition: color 0.25s, border-color 0.25s;
 }
-button:hover{ background:#e6005c; }
-.total{
-    font-size:20px;
-    font-weight:bold;
-    color:#ff4d88;
-    margin-bottom:20px;
+.header-back:hover { color: var(--rose); border-color: var(--rose); }
+ 
+/* ── STEPS ── */
+.steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 28px 6% 0;
+  max-width: 600px;
+  margin: 0 auto;
 }
-.mensaje-envio{
-    color:#b30059;
-    font-weight:bold;
-    margin-bottom:15px;
-    text-align:center;
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  position: relative;
 }
-.mensaje{
-    margin-top:15px;
-    text-align:center;
-    font-weight:bold;
+.step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 14px;
+  left: 60%;
+  right: -60%;
+  height: 1px;
+  background: var(--brown-pale);
 }
-.success { color:green; }
-.error { color:red; }
+.step.done:not(:last-child)::after { background: var(--rose-pale); }
+.step-circle {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  border: 1.5px solid var(--brown-pale);
+  background: var(--white);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--text-light);
+  position: relative; z-index: 1;
+}
+.step.done .step-circle { background: var(--rose-pale); border-color: var(--rose); color: var(--rose); }
+.step.active .step-circle { background: var(--rose); border-color: var(--rose); color: var(--white); }
+.step-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-light);
+  text-align: center;
+}
+.step.active .step-label { color: var(--rose); font-weight: 500; }
+.step.done .step-label { color: var(--brown-mid); }
+ 
+/* ── PAGE ── */
+.page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 28px;
+  align-items: start;
+}
+ 
+/* ── FORM PANEL ── */
+.form-panel {
+  background: var(--white);
+  border: 1px solid var(--brown-pale);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.panel-header {
+  padding: 24px 28px 20px;
+  border-bottom: 1px solid var(--brown-pale);
+}
+.panel-eyebrow {
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--rose);
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+.panel-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--brown);
+}
+.panel-title em { font-style: italic; color: var(--rose); }
+.panel-body { padding: 28px; }
+ 
+/* ── CAMPOS ── */
+.input-group { margin-bottom: 1.1rem; }
+.input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+ 
+label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-mid);
+  margin-bottom: 6px;
+}
+ 
+input, textarea {
+  width: 100%;
+  padding: 12px 14px;
+  font-family: 'Jost', sans-serif;
+  font-size: 0.9rem;
+  color: var(--text);
+  background: var(--cream);
+  border: 1px solid var(--brown-pale);
+  border-radius: 2px;
+  outline: none;
+  transition: border-color 0.25s, background 0.25s;
+  resize: none;
+}
+input:focus, textarea:focus { border-color: var(--rose); background: var(--white); }
+input::placeholder, textarea::placeholder { color: var(--text-light); }
+ 
+/* ── NOTA ENVÍO ── */
+.nota-envio {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: #fdf7e8;
+  border: 1px solid #e8d098;
+  border-radius: 2px;
+  padding: 14px 16px;
+  margin-bottom: 1.4rem;
+  font-size: 0.84rem;
+  color: #7a5c1a;
+  line-height: 1.55;
+}
+.nota-envio-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+ 
+/* ── BOTÓN ── */
+.btn-confirmar {
+  width: 100%;
+  padding: 15px;
+  background: var(--rose);
+  color: var(--white);
+  font-family: 'Jost', sans-serif;
+  font-size: 0.84rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background 0.25s, transform 0.2s;
+}
+.btn-confirmar:hover { background: var(--rose-light); transform: translateY(-1px); }
+.btn-confirmar:active { transform: translateY(0); }
+.btn-confirmar:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+ 
+/* ── MENSAJE ── */
+.mensaje {
+  font-size: 0.84rem;
+  text-align: center;
+  padding: 12px 16px;
+  border-radius: 2px;
+  margin-top: 14px;
+  display: none;
+  line-height: 1.5;
+}
+.mensaje.error   { display: block; background: #fdf0f0; color: #8a2a2a; border: 1px solid #e8b8b8; }
+.mensaje.success { display: block; background: #f0faf4; color: #3a7a55; border: 1px solid #98d8b8; }
+ 
+/* ── RESUMEN ── */
+.resumen {
+  background: var(--white);
+  border: 1px solid var(--brown-pale);
+  border-radius: 4px;
+  overflow: hidden;
+  position: sticky;
+  top: 88px;
+}
+.resumen-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--brown-pale);
+}
+.resumen-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--brown);
+}
+.resumen-body { padding: 16px 24px; }
+ 
+.resumen-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  color: var(--text-mid);
+  padding: 8px 0;
+  border-bottom: 1px dashed var(--brown-pale);
+  gap: 12px;
+}
+.resumen-item:last-of-type { border-bottom: none; }
+.resumen-item-name {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.resumen-item-name span:first-child { font-weight: 400; color: var(--text); }
+.resumen-item-name span:last-child  { font-size: 0.75rem; color: var(--text-light); }
+.resumen-item-price { font-weight: 500; white-space: nowrap; }
+ 
+.resumen-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 24px;
+  border-top: 1px solid var(--brown-pale);
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--brown);
+}
+.resumen-total-row span:last-child { color: var(--rose); }
+ 
+.resumen-seguro {
+  padding: 0 24px 20px;
+  font-size: 0.73rem;
+  color: var(--text-light);
+  text-align: center;
+  line-height: 1.5;
+}
+ 
+/* ── RESPONSIVE ── */
+@media (max-width: 720px) {
+  .page { grid-template-columns: 1fr; padding: 24px 16px 60px; }
+  .resumen { position: static; }
+  .input-row { grid-template-columns: 1fr; }
+  .steps { padding: 20px 16px 0; }
+}
 </style>
 </head>
-
 <body>
-
+ 
+<!-- ── HEADER ── -->
 <header>
-    <h1>Pago 💳</h1>
+  <a href="index.html" class="header-brand">María <span>José</span></a>
+  <button class="header-back" onclick="window.location.href='carrito.html'">← Carrito</button>
 </header>
-
-<div class="pago-container">
-    <h2>Finalizar Pedido</h2>
-
-    <div class="total">
-        Total a pagar: $<span id="total">0.00</span>
+ 
+<!-- ── STEPS ── -->
+<div style="max-width:900px; margin:0 auto;">
+  <div class="steps">
+    <div class="step done">
+      <div class="step-circle">✓</div>
+      <div class="step-label">Carrito</div>
     </div>
-
-    <input type="text" id="nombre" placeholder="Nombre completo / Full name" required>
-    <input type="tel" id="telefono" placeholder="Número telefónico / Phone number (ej: +1 555-123-4567)" required>
-    <input type="text" id="direccion" placeholder="Dirección de entrega / Delivery address" required>
-
-    <!-- Mensaje de gastos de envío -->
-    <p class="mensaje-envio">⚠️ Nota: Los gastos de envío correrán por tu cuenta / Shipping fees apply.</p>
-
-    <button onclick="confirmarPago()">Confirmar Pedido (Simular Pago) / Confirm Order (Simulate Payment)</button>
-
-    <div id="mensaje" class="mensaje"></div>
+    <div class="step active">
+      <div class="step-circle">2</div>
+      <div class="step-label">Datos</div>
+    </div>
+    <div class="step">
+      <div class="step-circle">3</div>
+      <div class="step-label">Confirmación</div>
+    </div>
+  </div>
 </div>
-
+ 
+<!-- ── PAGE ── -->
+<div class="page">
+ 
+  <!-- Formulario -->
+  <div class="form-panel">
+    <div class="panel-header">
+      <div class="panel-eyebrow">Paso 2 de 3</div>
+      <div class="panel-title">Datos de <em>entrega</em></div>
+    </div>
+    <div class="panel-body">
+ 
+      <div class="input-row">
+        <div class="input-group">
+          <label for="nombre">Nombre completo</label>
+          <input type="text" id="nombre" placeholder="Tu nombre" required>
+        </div>
+        <div class="input-group">
+          <label for="telefono">Teléfono</label>
+          <input type="tel" id="telefono" placeholder="+1 555-123-4567" required>
+        </div>
+      </div>
+ 
+      <div class="input-group">
+        <label for="direccion">Dirección de entrega</label>
+        <textarea id="direccion" rows="3" placeholder="Calle, número, colonia, ciudad…" required></textarea>
+      </div>
+ 
+      <div class="nota-envio">
+        <span class="nota-envio-icon">ℹ️</span>
+        <span>Los gastos de envío se coordinan directamente y corren por cuenta del cliente. Te contactaremos para confirmar los detalles.</span>
+      </div>
+ 
+      <button class="btn-confirmar" id="btnConfirmar" onclick="confirmarPago()">
+        Confirmar pedido
+      </button>
+      <div class="mensaje" id="mensaje"></div>
+ 
+    </div>
+  </div>
+ 
+  <!-- Resumen -->
+  <aside class="resumen">
+    <div class="resumen-header">
+      <div class="resumen-title">Tu pedido</div>
+    </div>
+    <div class="resumen-body" id="resumenBody"></div>
+    <div class="resumen-total-row">
+      <span>Total</span>
+      <span>$<span id="totalMostrar">0.00</span></span>
+    </div>
+    <p class="resumen-seguro">🔒 Pedido seguro · Datos protegidos</p>
+  </aside>
+ 
+</div>
+ 
 <script>
-const API = "";  // Relativa: mismo dominio (funciona en local y Render)
+const API = "";
 let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
 let usuario = JSON.parse(localStorage.getItem("usuario"));
-
-if(!usuario){
-    alert("Debes iniciar sesión para continuar / You must log in to continue.");
-    window.location.href = "login.html";
+ 
+if (!usuario) {
+  alert("Debes iniciar sesión para continuar.");
+  window.location.href = "login.html";
 }
-
-if(carrito.length === 0){
-    alert("Tu carrito está vacío / Your cart is empty.");
-    window.location.href = "carrito.html";
+if (carrito.length === 0) {
+  alert("Tu carrito está vacío.");
+  window.location.href = "carrito.html";
 }
-
-// Mostrar total
-function calcularTotal(){
-    let total = carrito.reduce((acc, item) => acc + (Number(item.precio) * item.cantidad), 0);
-    document.getElementById("total").textContent = total.toFixed(2);
-    return total;
+ 
+// ── Renderizar resumen ──
+function renderResumen() {
+  const body = document.getElementById("resumenBody");
+  let total = 0;
+ 
+  body.innerHTML = carrito.map(item => {
+    const subtotal = Number(item.precio) * item.cantidad;
+    total += subtotal;
+    const opcion = item.opcion ? `<span>${item.opcion}</span>` : '';
+    return `
+      <div class="resumen-item">
+        <div class="resumen-item-name">
+          <span>${item.nombre} ×${item.cantidad}</span>
+          ${opcion}
+        </div>
+        <div class="resumen-item-price">$${subtotal.toFixed(2)}</div>
+      </div>`;
+  }).join("");
+ 
+  document.getElementById("totalMostrar").textContent = total.toFixed(2);
+  return total;
 }
-calcularTotal();
-
-// ====== Simular pago y guardar pedido ======
-async function confirmarPago(){
-    const nombre = document.getElementById("nombre").value.trim();
-    const telefono = document.getElementById("telefono").value.trim();
-    const direccion = document.getElementById("direccion").value.trim();
-    const mensajeDiv = document.getElementById("mensaje");
-    mensajeDiv.textContent = "";
-    mensajeDiv.className = "";
-
-    if(!nombre || !telefono || !direccion){
-        mensajeDiv.textContent = "Por favor completa nombre, teléfono y dirección / Please complete name, phone and address.";
-        mensajeDiv.className = "error";
-        return;
+ 
+const total = renderResumen();
+ 
+// ── Confirmar pago ──
+async function confirmarPago() {
+  const nombre    = document.getElementById("nombre").value.trim();
+  const telefono  = document.getElementById("telefono").value.trim();
+  const direccion = document.getElementById("direccion").value.trim();
+  const mensajeDiv = document.getElementById("mensaje");
+  const btnConfirmar = document.getElementById("btnConfirmar");
+ 
+  mensajeDiv.textContent = "";
+  mensajeDiv.className = "mensaje";
+ 
+  if (!nombre || !telefono || !direccion) {
+    mensajeDiv.textContent = "Por favor completa todos los campos.";
+    mensajeDiv.className = "mensaje error";
+    return;
+  }
+ 
+  if (!/^\+?\d{8,15}$/.test(telefono.replace(/[\-\s]/g, ''))) {
+    mensajeDiv.textContent = "El teléfono debe tener entre 8 y 15 dígitos.";
+    mensajeDiv.className = "mensaje error";
+    return;
+  }
+ 
+  btnConfirmar.disabled = true;
+  btnConfirmar.textContent = "Procesando pedido…";
+ 
+  const pedido = {
+    usuario: usuario.correo,
+    nombreCliente: nombre,
+    telefono,
+    direccion,
+    productos: carrito,
+    total
+  };
+ 
+  try {
+    const res = await fetch(`${API}/api/pedidos`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(pedido)
+    });
+ 
+    const data = await res.json();
+ 
+    if (res.ok) {
+      mensajeDiv.textContent = "¡Pedido registrado exitosamente! 🎉 Redirigiendo a tus pedidos…";
+      mensajeDiv.className = "mensaje success";
+      localStorage.removeItem("carrito");
+      setTimeout(() => { window.location.href = "mis-pedidos.html"; }, 1800);
+    } else {
+      mensajeDiv.textContent = data.mensaje || "Error al registrar el pedido.";
+      mensajeDiv.className = "mensaje error";
+      btnConfirmar.disabled = false;
+      btnConfirmar.textContent = "Confirmar pedido";
     }
-
-    // Validación flexible de teléfono (8-15 dígitos, con o sin +)
-    if (!/^\+?\d{8,15}$/.test(telefono.replace(/[\-\s]/g, ''))) {
-        mensajeDiv.textContent = "El teléfono debe tener entre 8 y 15 dígitos / Phone number must be 8-15 digits.";
-        mensajeDiv.className = "error";
-        return;
-    }
-
-    const total = calcularTotal();
-
-    const pedido = {
-        usuario: usuario.correo,
-        nombreCliente: nombre,
-        telefono: telefono,
-        direccion: direccion,
-        productos: carrito,
-        total: total
-    };
-
-    try {
-        const res = await fetch(`${API}/api/pedidos`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(pedido)
-        });
-
-        const data = await res.json();
-
-        if(res.ok){
-            mensajeDiv.textContent = "¡Pedido registrado exitosamente! 🎉 Redirigiendo... / Order registered successfully! Redirecting...";
-            mensajeDiv.className = "success";
-            localStorage.removeItem("carrito"); // Limpia carrito
-            setTimeout(() => {
-                window.location.href = "mis-pedidos.html";
-            }, 1500);
-        } else {
-            mensajeDiv.textContent = data.mensaje || "Error al registrar el pedido / Error registering order.";
-            mensajeDiv.className = "error";
-        }
-    } catch (err) {
-        mensajeDiv.textContent = "Error de conexión con el servidor / Server connection error: " + err.message;
-        mensajeDiv.className = "error";
-        console.error("Error en pago:", err);
-    }
+  } catch (err) {
+    mensajeDiv.textContent = "Error de conexión: " + err.message;
+    mensajeDiv.className = "mensaje error";
+    console.error("Error en pago:", err);
+    btnConfirmar.disabled = false;
+    btnConfirmar.textContent = "Confirmar pedido";
+  }
 }
 </script>
-
+ 
 </body>
 </html>
