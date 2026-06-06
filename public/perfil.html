@@ -1,99 +1,498 @@
+
+raw
+Perfil · HTML
 <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Mi Perfil | José Maria</title>
+<title>Mi Perfil | María José Repostería</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+:root {
+  --rose:       #c9697a;
+  --rose-light: #e8a0aa;
+  --rose-pale:  #f5dde0;
+  --cream:      #fdf8f3;
+  --brown:      #6b4c3b;
+  --brown-mid:  #9a7060;
+  --brown-pale: #e8dbd6;
+  --text:       #3a2a26;
+  --text-mid:   #7a5c54;
+  --text-light: #b89a94;
+  --white:      #ffffff;
+}
+ 
+body {
+  font-family: 'Jost', sans-serif;
+  background: var(--cream);
+  color: var(--text);
+  min-height: 100vh;
+}
+ 
+/* ── HEADER ── */
+header {
+  background: var(--white);
+  border-bottom: 1px solid var(--brown-pale);
+  padding: 0 6%;
+  height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 2px 16px rgba(107,76,59,0.06);
+}
+.header-brand {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--brown);
+  text-decoration: none;
+}
+.header-brand span { color: var(--rose); font-style: italic; }
+.header-back {
+  font-family: 'Jost', sans-serif;
+  font-size: 0.76rem;
+  font-weight: 500;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--text-light);
+  background: none;
+  border: 1px solid var(--brown-pale);
+  border-radius: 2px;
+  padding: 8px 18px;
+  cursor: pointer;
+  transition: color 0.25s, border-color 0.25s;
+}
+.header-back:hover { color: var(--rose); border-color: var(--rose); }
+ 
+/* ── PAGE ── */
+.page {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 52px 24px 80px;
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 28px;
+  align-items: start;
+}
+ 
+/* ── AVATAR PANEL ── */
+.avatar-panel {
+  background: var(--white);
+  border: 1px solid var(--brown-pale);
+  border-radius: 4px;
+  padding: 36px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+  position: sticky;
+  top: 88px;
+}
+ 
+.avatar-wrap {
+  position: relative;
+  width: 110px; height: 110px;
+  cursor: pointer;
+}
+.avatar-img {
+  width: 110px; height: 110px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--rose-pale);
+  display: block;
+  transition: filter 0.25s;
+}
+.avatar-wrap:hover .avatar-img { filter: brightness(0.8); }
+.avatar-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(201,105,122,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.25s;
+  pointer-events: none;
+}
+.avatar-wrap:hover .avatar-overlay { opacity: 1; }
+.avatar-overlay-icon {
+  font-size: 1.3rem;
+  color: var(--rose);
+}
+.avatar-input { display: none; }
+ 
+.avatar-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--brown);
+  line-height: 1.2;
+}
+.avatar-email {
+  font-size: 0.82rem;
+  color: var(--text-light);
+  font-weight: 300;
+}
+.avatar-hint {
+  font-size: 0.72rem;
+  color: var(--text-light);
+  letter-spacing: 0.05em;
+  line-height: 1.5;
+}
+ 
+.avatar-divider {
+  width: 100%;
+  height: 1px;
+  background: var(--brown-pale);
+}
+ 
+.btn-logout {
+  width: 100%;
+  padding: 11px;
+  background: transparent;
+  color: var(--text-light);
+  font-family: 'Jost', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: 1px solid var(--brown-pale);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: color 0.25s, border-color 0.25s;
+}
+.btn-logout:hover { color: var(--rose); border-color: var(--rose); }
+ 
+/* ── INFO PANEL ── */
+.info-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+ 
+.card {
+  background: var(--white);
+  border: 1px solid var(--brown-pale);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.card-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--brown-pale);
+}
+.card-eyebrow {
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--rose);
+  font-weight: 500;
+  margin-bottom: 3px;
+}
+.card-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--brown);
+}
+.card-body { padding: 24px; }
+ 
+/* ── INFO FIELDS ── */
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+.field-row:last-child { margin-bottom: 0; }
+ 
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.field label {
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-light);
+  font-weight: 500;
+}
+.field-value {
+  font-size: 0.95rem;
+  color: var(--text);
+  font-weight: 400;
+  padding: 11px 14px;
+  background: var(--cream);
+  border: 1px solid var(--brown-pale);
+  border-radius: 2px;
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+}
+ 
+/* ── FOTO UPLOAD ── */
+.upload-zone {
+  border: 1.5px dashed var(--brown-pale);
+  border-radius: 3px;
+  padding: 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.25s, background 0.25s;
+  position: relative;
+}
+.upload-zone:hover { border-color: var(--rose); background: var(--rose-pale); }
+.upload-zone input { display: none; }
+.upload-icon { font-size: 1.8rem; margin-bottom: 8px; opacity: 0.5; }
+.upload-label {
+  font-size: 0.85rem;
+  color: var(--text-mid);
+  font-weight: 400;
+  margin-bottom: 4px;
+}
+.upload-hint {
+  font-size: 0.73rem;
+  color: var(--text-light);
+}
+.upload-btn {
+  display: inline-block;
+  margin-top: 12px;
+  font-size: 0.74rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--rose);
+  font-weight: 500;
+  border-bottom: 1px solid var(--rose-pale);
+  padding-bottom: 1px;
+  transition: border-color 0.25s;
+}
+.upload-zone:hover .upload-btn { border-color: var(--rose); }
+ 
+/* ── MENSAJE ── */
+.mensaje {
+  font-size: 0.84rem;
+  padding: 12px 16px;
+  border-radius: 2px;
+  margin-top: 14px;
+  display: none;
+}
+.mensaje.success { display: block; background: #f0faf4; color: #3a7a55; border: 1px solid #98d8b8; }
+.mensaje.error   { display: block; background: #fdf0f0; color: #8a2a2a; border: 1px solid #e8b8b8; }
+ 
+/* ── QUICK LINKS ── */
+.quick-links {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.quick-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 18px;
+  background: var(--cream);
+  border: 1px solid var(--brown-pale);
+  border-radius: 3px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color 0.25s, background 0.25s;
+}
+.quick-link:hover { border-color: var(--rose-light); background: var(--white); }
+.quick-link-icon { font-size: 1.3rem; }
+.quick-link-text { }
+.quick-link-title {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--brown);
+  margin-bottom: 2px;
+}
+.quick-link-sub {
+  font-size: 0.72rem;
+  color: var(--text-light);
+}
+ 
+/* ── RESPONSIVE ── */
+@media (max-width: 700px) {
+  .page { grid-template-columns: 1fr; padding: 28px 16px 60px; }
+  .avatar-panel { position: static; }
+  .field-row { grid-template-columns: 1fr; gap: 14px; }
+  .quick-links { grid-template-columns: 1fr; }
+}
+</style>
 </head>
 <body>
-
+ 
+<!-- ── HEADER ── -->
 <header>
-    <h1>Pastelería <strong>José Maria</strong></h1>
+  <a href="index.html" class="header-brand">María <span>José</span></a>
+  <button class="header-back" onclick="window.location.href='index.html'">← Inicio</button>
 </header>
-
-<div class="perfil-container">
-    <h2>Mi Perfil</h2>
-
-    <img id="fotoActual" src="https://via.placeholder.com/150" class="perfil-img">
-
-    <div class="input-group">
-        <label>Nombre</label>
-        <p id="nombreUsuario" class="readonly-input"></p>
+ 
+<!-- ── PAGE ── -->
+<div class="page">
+ 
+  <!-- Avatar Panel -->
+  <aside class="avatar-panel">
+    <div class="avatar-wrap" onclick="document.getElementById('avatarInput').click()" title="Cambiar foto">
+      <img class="avatar-img" id="fotoActual" src="https://via.placeholder.com/150" alt="Foto de perfil">
+      <div class="avatar-overlay">
+        <span class="avatar-overlay-icon">📷</span>
+      </div>
     </div>
-
-    <div class="input-group">
-        <label>Correo</label>
-        <p id="correoUsuario" class="readonly-input"></p>
+    <input type="file" id="avatarInput" accept="image/*">
+ 
+    <div>
+      <div class="avatar-name" id="nombreDisplay">—</div>
+      <div class="avatar-email" id="correoDisplay">—</div>
     </div>
-
-    <div class="input-group">
-        <label>Cambiar foto de perfil</label>
-        <input type="file" id="fotoPerfil" accept="image/*">
+ 
+    <span class="avatar-hint">Haz clic en la foto para cambiarla</span>
+ 
+    <div class="avatar-divider"></div>
+ 
+    <button class="btn-logout" onclick="cerrarSesion()">Cerrar sesión</button>
+  </aside>
+ 
+  <!-- Info Panel -->
+  <div class="info-panel">
+ 
+    <!-- Datos de cuenta -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-eyebrow">Tu cuenta</div>
+        <div class="card-title">Información personal</div>
+      </div>
+      <div class="card-body">
+        <div class="field-row">
+          <div class="field">
+            <label>Nombre completo</label>
+            <div class="field-value" id="nombreUsuario">—</div>
+          </div>
+          <div class="field">
+            <label>Correo electrónico</label>
+            <div class="field-value" id="correoUsuario">—</div>
+          </div>
+        </div>
+      </div>
     </div>
-
-    <div id="mensaje" class="mensaje"></div>
-
-    <button class="btn cerrar" onclick="cerrarSesion()">Cerrar Sesión</button>
-    <button class="btn volver" onclick="volverInicio()">Volver al Inicio</button>
+ 
+    <!-- Cambiar foto -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-eyebrow">Personalización</div>
+        <div class="card-title">Foto de perfil</div>
+      </div>
+      <div class="card-body">
+        <div class="upload-zone" onclick="document.getElementById('avatarInput').click()">
+          <div class="upload-icon">🖼️</div>
+          <div class="upload-label">Selecciona una nueva foto</div>
+          <div class="upload-hint">JPG, PNG o GIF · Máx. recomendado 2 MB</div>
+          <span class="upload-btn">Elegir archivo</span>
+        </div>
+        <div class="mensaje" id="mensaje"></div>
+      </div>
+    </div>
+ 
+    <!-- Accesos rápidos -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-eyebrow">Navegación</div>
+        <div class="card-title">Accesos rápidos</div>
+      </div>
+      <div class="card-body">
+        <div class="quick-links">
+          <div class="quick-link" onclick="window.location.href='mis-pedidos.html'">
+            <span class="quick-link-icon">📦</span>
+            <div class="quick-link-text">
+              <div class="quick-link-title">Mis pedidos</div>
+              <div class="quick-link-sub">Ver historial</div>
+            </div>
+          </div>
+          <div class="quick-link" onclick="window.location.href='carrito.html'">
+            <span class="quick-link-icon">🛒</span>
+            <div class="quick-link-text">
+              <div class="quick-link-title">Mi carrito</div>
+              <div class="quick-link-sub">Ver productos</div>
+            </div>
+          </div>
+          <div class="quick-link" onclick="window.location.href='index.html'">
+            <span class="quick-link-icon">🎂</span>
+            <div class="quick-link-text">
+              <div class="quick-link-title">Productos</div>
+              <div class="quick-link-sub">Explorar menú</div>
+            </div>
+          </div>
+          <div class="quick-link" onclick="cerrarSesion()">
+            <span class="quick-link-icon">👋</span>
+            <div class="quick-link-text">
+              <div class="quick-link-title">Cerrar sesión</div>
+              <div class="quick-link-sub">Salir de tu cuenta</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+ 
+  </div>
 </div>
-
+ 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    const usuario = JSON.parse(localStorage.getItem("usuario"));
-    if (!usuario) {
-        alert("Debes iniciar sesión primero");
-        window.location.href = "login.html";
-        return;
-    }
-
-    const nombreP = document.getElementById("nombreUsuario");
-    const correoP = document.getElementById("correoUsuario");
-    const fotoActual = document.getElementById("fotoActual");
-    const mensajeDiv = document.getElementById("mensaje");
-
-    // Mostrar datos
-    nombreP.textContent = usuario.nombre;
-    correoP.textContent = usuario.correo;
-
-    const fotoGuardada = localStorage.getItem("fotoPerfil");
-    if (fotoGuardada) fotoActual.src = fotoGuardada;
-
-    // Cambiar foto
-    document.getElementById("fotoPerfil").addEventListener("change", function(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = function(ev) {
-            const img = new Image();
-            img.src = ev.target.result;
-            img.onload = function() {
-                const canvas = document.createElement("canvas");
-                const ctx = canvas.getContext("2d");
-                const size = 150;
-                canvas.width = size;
-                canvas.height = size;
-                ctx.drawImage(img, 0, 0, size, size);
-                const compressed = canvas.toDataURL("image/jpeg", 0.7);
-                localStorage.setItem("fotoPerfil", compressed);
-                fotoActual.src = compressed;
-                mensajeDiv.textContent = "Foto actualizada ✅";
-                mensajeDiv.className = "mensaje success";
-            };
-        };
-        reader.readAsDataURL(file);
-    });
-});
-
-function volverInicio() { window.location.href = "index.html"; }
-function cerrarSesion() {
-    localStorage.removeItem("usuario");
-    localStorage.removeItem("fotoPerfil");
-    alert("Sesión cerrada 👋");
+  const usuario = JSON.parse(localStorage.getItem("usuario"));
+  if (!usuario) {
+    alert("Debes iniciar sesión primero.");
     window.location.href = "login.html";
+    return;
+  }
+ 
+  // Poblar datos
+  document.getElementById("nombreUsuario").textContent = usuario.nombre || "—";
+  document.getElementById("correoUsuario").textContent = usuario.correo || "—";
+  document.getElementById("nombreDisplay").textContent = usuario.nombre || "—";
+  document.getElementById("correoDisplay").textContent  = usuario.correo || "—";
+ 
+  const fotoGuardada = localStorage.getItem("fotoPerfil");
+  if (fotoGuardada) document.getElementById("fotoActual").src = fotoGuardada;
+ 
+  // Cambiar foto (ambos inputs apuntan al mismo elemento)
+  document.getElementById("avatarInput").addEventListener("change", function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+ 
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      const img = new Image();
+      img.src = ev.target.result;
+      img.onload = function() {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        const size = 150;
+        canvas.width = size;
+        canvas.height = size;
+        ctx.drawImage(img, 0, 0, size, size);
+        const compressed = canvas.toDataURL("image/jpeg", 0.7);
+        localStorage.setItem("fotoPerfil", compressed);
+        document.getElementById("fotoActual").src = compressed;
+        const msg = document.getElementById("mensaje");
+        msg.textContent = "¡Foto actualizada correctamente!";
+        msg.className = "mensaje success";
+      };
+    };
+    reader.readAsDataURL(file);
+  });
+});
+ 
+function cerrarSesion() {
+  localStorage.removeItem("usuario");
+  localStorage.removeItem("fotoPerfil");
+  window.location.href = "login.html";
 }
 </script>
-
+ 
 </body>
 </html>

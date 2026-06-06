@@ -2,77 +2,348 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Login | Pastelería</title>
+<title>Iniciar Sesión | María José Repostería</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-body { margin:0;font-family:Arial,sans-serif; background:linear-gradient(135deg,#ff9eb5,#ffc1d6); display:flex; justify-content:center; align-items:center; height:100vh; }
-.container { background:white;padding:40px;border-radius:12px;box-shadow:0 8px 20px rgba(0,0,0,0.2); width:350px; }
-h2 { text-align:center;margin-bottom:25px;color:#ff4d88; }
-.input-group { margin-bottom:15px; }
-input { width:100%;padding:10px;border-radius:6px;border:1px solid #ccc; outline:none; }
-input:focus { border-color:#ff4d88; }
-.btn { width:100%;padding:10px;background:#ff4d88;color:white;border:none;border-radius:6px;font-weight:bold;cursor:pointer; margin-top:10px; }
-.btn:hover { opacity:0.9; }
-.login-link { text-align:center;margin-top:15px; }
-.login-link a { color:#ff4d88; text-decoration:none; font-weight:bold; }
-.error { color:red;font-size:14px;margin-top:5px;text-align:center; }
-.success { color:green;font-size:14px;margin-top:5px;text-align:center; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+:root {
+  --rose:       #c9697a;
+  --rose-light: #e8a0aa;
+  --rose-pale:  #f5dde0;
+  --cream:      #fdf8f3;
+  --brown:      #6b4c3b;
+  --brown-mid:  #9a7060;
+  --brown-pale: #e8dbd6;
+  --text:       #3a2a26;
+  --text-mid:   #7a5c54;
+  --text-light: #b89a94;
+  --white:      #ffffff;
+}
+ 
+body {
+  font-family: 'Jost', sans-serif;
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: var(--cream);
+  color: var(--text);
+}
+ 
+/* ── PANEL DERECHO (decorativo) ── */
+.right-panel {
+  background: var(--brown);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 48px;
+  position: relative;
+  overflow: hidden;
+  order: 2;
+}
+.right-panel::before {
+  content: '';
+  position: absolute;
+  top: -80px; left: -80px;
+  width: 280px; height: 280px;
+  border: 1px solid rgba(201,105,122,0.2);
+  border-radius: 50%;
+}
+.right-panel::after {
+  content: '';
+  position: absolute;
+  bottom: -60px; right: -60px;
+  width: 200px; height: 200px;
+  border: 1px solid rgba(201,105,122,0.15);
+  border-radius: 50%;
+}
+.right-brand {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: var(--white);
+  text-align: center;
+  line-height: 1.1;
+  margin-bottom: 6px;
+  position: relative; z-index: 1;
+}
+.right-brand span { color: var(--rose-light); font-style: italic; }
+.right-tagline {
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+  text-align: center;
+  margin-bottom: 48px;
+  position: relative; z-index: 1;
+}
+.right-img {
+  width: 100%;
+  max-width: 340px;
+  aspect-ratio: 3/4;
+  object-fit: cover;
+  border-radius: 4px;
+  opacity: 0.75;
+  position: relative; z-index: 1;
+}
+.right-quote {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 1.05rem;
+  color: rgba(255,255,255,0.5);
+  text-align: center;
+  margin-top: 36px;
+  line-height: 1.7;
+  max-width: 280px;
+  position: relative; z-index: 1;
+}
+ 
+/* ── PANEL IZQUIERDO (formulario) ── */
+.left-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 60px 8%;
+  background: var(--white);
+  order: 1;
+}
+ 
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-light);
+  text-decoration: none;
+  margin-bottom: 48px;
+  transition: color 0.25s;
+}
+.back-link:hover { color: var(--rose); }
+.back-link::before { content: '←'; font-size: 0.9rem; }
+ 
+.form-eyebrow {
+  font-size: 0.68rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--rose);
+  font-weight: 500;
+  margin-bottom: 0.7rem;
+}
+.form-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--brown);
+  line-height: 1.15;
+  margin-bottom: 0.5rem;
+}
+.form-title em { font-style: italic; color: var(--rose); }
+.form-sub {
+  font-size: 0.9rem;
+  font-weight: 300;
+  color: var(--text-mid);
+  margin-bottom: 2.2rem;
+  line-height: 1.6;
+}
+ 
+/* ── CAMPOS ── */
+.input-group { margin-bottom: 1.1rem; }
+ 
+label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-mid);
+  margin-bottom: 6px;
+}
+ 
+input {
+  width: 100%;
+  padding: 12px 14px;
+  font-family: 'Jost', sans-serif;
+  font-size: 0.9rem;
+  color: var(--text);
+  background: var(--cream);
+  border: 1px solid var(--brown-pale);
+  border-radius: 2px;
+  outline: none;
+  transition: border-color 0.25s, background 0.25s;
+}
+input:focus { border-color: var(--rose); background: var(--white); }
+input::placeholder { color: var(--text-light); }
+ 
+/* ── BOTÓN ── */
+.btn-submit {
+  width: 100%;
+  padding: 14px;
+  background: var(--rose);
+  color: var(--white);
+  font-family: 'Jost', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  margin-top: 0.4rem;
+  transition: background 0.25s, transform 0.2s;
+}
+.btn-submit:hover { background: var(--rose-light); transform: translateY(-1px); }
+.btn-submit:active { transform: translateY(0); }
+.btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+ 
+/* ── MENSAJE ── */
+.mensaje {
+  font-size: 0.84rem;
+  text-align: center;
+  padding: 10px 14px;
+  border-radius: 2px;
+  margin-top: 12px;
+  display: none;
+}
+.mensaje.error   { display: block; background: #fdf0f0; color: #b94a4a; border: 1px solid #f0c8c8; }
+.mensaje.success { display: block; background: #f0faf4; color: #3a7a55; border: 1px solid #b8e0c8; }
+ 
+/* ── DIVIDER ── */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 1.4rem 0;
+  color: var(--text-light);
+  font-size: 0.75rem;
+}
+.divider::before, .divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--brown-pale);
+}
+ 
+.register-link {
+  text-align: center;
+  font-size: 0.88rem;
+  color: var(--text-mid);
+}
+.register-link a {
+  color: var(--rose);
+  text-decoration: none;
+  font-weight: 500;
+  border-bottom: 1px solid var(--rose-pale);
+  padding-bottom: 1px;
+  transition: border-color 0.25s;
+}
+.register-link a:hover { border-color: var(--rose); }
+ 
+/* ── RESPONSIVE ── */
+@media (max-width: 780px) {
+  body { grid-template-columns: 1fr; }
+  .right-panel { display: none; }
+  .left-panel { padding: 48px 6%; min-height: 100vh; justify-content: center; }
+}
 </style>
 </head>
 <body>
-
-<div class="container">
-<h2>Iniciar Sesión</h2>
-<div class="input-group"><input type="email" id="correo" placeholder="Correo" required></div>
-<div class="input-group"><input type="password" id="password" placeholder="Contraseña" required></div>
-<button class="btn" onclick="login()">Entrar</button>
-<div class="login-link">¿No tienes cuenta? <a href="register.html">Regístrate</a></div>
-<div id="mensaje"></div>
+ 
+<!-- Panel formulario -->
+<div class="left-panel">
+  <a href="index.html" class="back-link">Volver al inicio</a>
+ 
+  <div class="form-eyebrow">Bienvenida de vuelta</div>
+  <h1 class="form-title">Inicia tu <em>sesión</em></h1>
+  <p class="form-sub">Accede a tu cuenta para ver tus pedidos, gestionar tu perfil y disfrutar de nuestras delicias.</p>
+ 
+  <div class="input-group">
+    <label for="correo">Correo Electrónico</label>
+    <input type="email" id="correo" placeholder="correo@ejemplo.com" required>
+  </div>
+  <div class="input-group">
+    <label for="password">Contraseña</label>
+    <input type="password" id="password" placeholder="Tu contraseña" required
+      onkeydown="if(event.key==='Enter') login()">
+  </div>
+ 
+  <button class="btn-submit" id="submitBtn" onclick="login()">Entrar</button>
+  <div class="mensaje" id="mensaje"></div>
+ 
+  <div class="divider">o</div>
+ 
+  <div class="register-link">
+    ¿No tienes cuenta? <a href="register.html">Regístrate gratis</a>
+  </div>
 </div>
-
+ 
+<!-- Panel decorativo -->
+<div class="right-panel">
+  <div class="right-brand">María <span>José</span></div>
+  <div class="right-tagline">Repostería Artesanal</div>
+  <img class="right-img"
+    src="https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?w=600&q=80"
+    alt="Repostería María José">
+  <p class="right-quote">"El dulce sabor de un momento especial, hecho con amor para ti."</p>
+</div>
+ 
 <script>
-// Redirige si ya hay usuario guardado
+// Redirige si ya hay sesión activa
 const usuarioGuardado = JSON.parse(localStorage.getItem("usuario"));
-if(usuarioGuardado){ window.location.href = (usuarioGuardado.role==="admin") ? "admin.html" : "index.html"; }
-
-async function login(){
-    const correo = document.getElementById("correo").value.trim();
-    const password = document.getElementById("password").value;
-    const mensajeDiv = document.getElementById("mensaje");
-    mensajeDiv.textContent = ""; 
-    mensajeDiv.className = "";
-
-    try{
-        const res = await fetch("/api/login", {
-            method:"POST",
-            headers: { "Content-Type":"application/json" },
-            body: JSON.stringify({ correo, password })
-        });
-
-        let data;
-        try {
-            data = await res.json();
-        } catch (jsonErr) {
-            data = { mensaje: "Respuesta no es JSON: " + await res.text() };
-        }
-
-        mensajeDiv.textContent = data.mensaje || (res.ok ? "Login exitoso ✅" : `Error ${res.status}: ${res.statusText}`);
-        mensajeDiv.className = res.ok ? "success" : "error";
-
-        console.log("Login status:", res.status);
-        console.log("Login data:", data);
-
-        if (res.ok) {
-            localStorage.setItem("usuario", JSON.stringify(data.usuario));
-            setTimeout(() => { window.location.href = (data.usuario.role==="admin") ? "admin.html" : "index.html"; }, 1000);
-        }
-    }catch(err){
-        mensajeDiv.textContent = "Error de conexión real: " + err.message;
-        mensajeDiv.className = "error";
-        console.error("Login fetch error:", err);
+if (usuarioGuardado) {
+  window.location.href = (usuarioGuardado.role === "admin") ? "admin.html" : "index.html";
+}
+ 
+async function login() {
+  const correo     = document.getElementById("correo").value.trim();
+  const password   = document.getElementById("password").value;
+  const mensajeDiv = document.getElementById("mensaje");
+  const submitBtn  = document.getElementById("submitBtn");
+ 
+  mensajeDiv.textContent = "";
+  mensajeDiv.className = "mensaje";
+ 
+  if (!correo || !password) {
+    mensajeDiv.textContent = "Por favor completa todos los campos.";
+    mensajeDiv.className = "mensaje error";
+    return;
+  }
+ 
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Verificando…";
+ 
+  try {
+    const res = await fetch("/api/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ correo, password })
+    });
+ 
+    let data;
+    try { data = await res.json(); }
+    catch { data = { mensaje: "Respuesta inesperada del servidor." }; }
+ 
+    mensajeDiv.textContent = data.mensaje || (res.ok ? "¡Bienvenida!" : `Error ${res.status}`);
+    mensajeDiv.className = "mensaje " + (res.ok ? "success" : "error");
+ 
+    if (res.ok) {
+      localStorage.setItem("usuario", JSON.stringify(data.usuario));
+      setTimeout(() => {
+        window.location.href = (data.usuario.role === "admin") ? "admin.html" : "index.html";
+      }, 1000);
     }
+  } catch (err) {
+    mensajeDiv.textContent = "Error de conexión: " + err.message;
+    mensajeDiv.className = "mensaje error";
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Entrar";
+  }
 }
 </script>
-
+ 
 </body>
 </html>
